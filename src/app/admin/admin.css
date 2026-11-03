@@ -1,0 +1,18 @@
+.admin-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:16px; }
+.admin-stats .account-card { margin:8px 0; text-decoration:none; }
+.admin-stats h2 { font-size:17px; line-height:1.5; }
+.admin-stats strong { font-size:34px; color:var(--teal); }
+.admin-filters { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; }
+.admin-page label { display:block; font-weight:600; margin:12px 0 8px; }
+.admin-page input,.admin-page select,.admin-page textarea { display:block; width:100%; max-width:100%; min-width:0; font:inherit; color:inherit; padding:12px; background:#fff; border:1px solid #a8babd; border-radius:8px; margin:8px 0 16px; }
+.admin-page textarea { min-height:120px; }
+.admin-page button:disabled { opacity:.6; cursor:not-allowed; }
+.admin-documents { padding-left:20px; }
+.admin-documents li { padding:16px 0; border-bottom:1px solid #dbe6e6; }
+.admin-page p,.admin-page li { overflow-wrap:anywhere; }
+.admin-note { white-space:pre-wrap; }
+.admin-page .account-actions { margin-top:8px; }
+@media(max-width:640px) { .admin-filters { grid-template-columns:1fr; } .admin-stats { grid-template-columns:1fr; } .account-header { flex-wrap:wrap; padding-block:12px; } }
+.admin-page .notification-action label { display: flex; align-items: flex-start; gap: 10px; font-weight: 400; }
+.admin-page .notification-action input[type="checkbox"] { display: inline-block; width: 20px; height: 20px; padding: 0; margin: 3px 0 0; flex-shrink: 0; }
+.notification-job header { flex-wrap: wrap; gap: 12px; }
