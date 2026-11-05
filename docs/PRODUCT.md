@@ -1,5 +1,9 @@
 # Product and current scope
 
+## Separate admin sign-in — 5 November 2026
+
+Customers continue to use `/login`. Administrators use the direct `/admin-login` URL, without a public navigation or sitemap link. Both retain the configured email OTP provider; the admin entry accepts existing accounts only and requires an independently verified active staff role after OTP. Admin logout returns to that dedicated entry. Shared identity sessions remain intentional: separate entry screens do not create separate passwords, grant roles or replace server authorization. Customer login return URLs cannot enter the staff workspace. No database, credentials, payment or deployment changes are required.
+
 ## Admin navigation refinement — 5 November 2026
 
 Added grouped Reservations/Website & Business/Monitoring navigation, nested editor links, breadcrumbs, context links, keyboard section search and a mobile drawer. The overview prioritizes real queues/exceptions and separates reservation tasks from website management. Existing staff authorization, CMS publication/unsaved-edit handling, paid-only document operations and customer ownership are preserved. No new backend capability, migration, credential or deployment is introduced by this refinement.

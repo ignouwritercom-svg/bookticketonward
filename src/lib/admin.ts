@@ -2,7 +2,7 @@ import "server-only";
 import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { verifiedCustomer } from "./supabase/server";
-import { safeReturnPath } from "./account";
+import { safeAdminReturnPath } from "./account";
 
 export async function staffSession() {
   const session = await verifiedCustomer();
@@ -15,6 +15,6 @@ export async function staffPage(destination: string) {
   await connection();
   const session = await staffSession();
   if (session.client && !session.user)
-    redirect(`/login?next=${encodeURIComponent(safeReturnPath(destination))}`);
+    redirect(`/admin-login?next=${encodeURIComponent(safeAdminReturnPath(destination))}`);
   return session;
 }

@@ -1,5 +1,7 @@
 # Phase 4 — staff orders and private documents
 
+**Admin entry:** open `/admin-login` directly (production: `https://dummyticketonward.com/admin-login`). It is intentionally absent from public navigation. Use the existing verified admin email and emailed OTP; no new password, registration, migration or role grant is needed. `/login` is the customer entry. Existing active staff authorization is still checked on every protected operation. Both entry screens share the same Supabase identity session in a browser; use separate browser profiles if working as a customer and administrator simultaneously.
+
 **Managed-workspace addition:** after the four existing migrations, persistent website editing/customer-directory features use a fifth additive migration and a server enable flag. Follow [ADMIN_WORKSPACE.md](ADMIN_WORKSPACE.md). Existing staff accounts and payment/document restrictions remain; no migration runs automatically.
 
 **Phase 7 addition:** transactional account updates and the protected notification log use a fourth additive migration and a separate restricted Node worker. Follow [NOTIFICATIONS_SETUP.md](NOTIFICATIONS_SETUP.md) after the three foundation migrations below. Document email/WhatsApp delivery remains a distinct manual staff action. The existing `test:admin` suite verifies the three foundation migrations; `test:notifications` applies all four and verifies notification RLS, triggers, leases and retries.

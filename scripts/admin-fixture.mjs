@@ -4,7 +4,7 @@ import { createServer } from "node:http";
 import { randomUUID } from "node:crypto";
 import { PGlite } from "@electric-sql/pglite";
 import { installManagementDatabase } from "./management-database.mjs";
-import { fixtureOwner, fixtureOther, fixtureUser, identity } from "./workspace-fixture.mjs";
+import { fixtureOwner, fixtureOther, fixtureUser, fixtureCookie, identity } from "./workspace-fixture.mjs";
 export const adminFixtureSecret = "sb_secret_LOCAL_SYNTHETIC_ADMIN_STORAGE_ONLY";
 export const adminFixtureKey = "sb_publishable_LOCAL_SYNTHETIC_ADMIN_ONLY";
 export const fixturePdf = Buffer.from("%PDF-1.4\n% SYNTHETIC LOCAL ADMIN TEST ONLY\n1 0 obj\n<< /Type /Catalog >>\nendobj\n%%EOF\n");
@@ -45,6 +45,20 @@ export async function startAdminFixture(port = 3211) {
       try {
         if (url.pathname === "/auth/v1/user") return owner ? send(fixtureUser(owner)) : send({ message: "Synthetic session required" }, 401);
         if (url.pathname === "/auth/v1/logout") return send({});
+        // Synthetic OTP transport exists only in this disposable loopback fixture.
+        if (url.pathname === "/auth/v1/otp") {
+          const input = JSON.parse(bytes.toString());
+          if (input.create_user !== false) return send({ message: "Staff entry must not create users", code: "fixture_registration_denied" }, 400);
+          if (![fixtureOwner, fixtureOther].some(id => fixtureUser(id).email === input.email)) return send({ message: "Signups disabled", code: "otp_disabled" }, 400);
+          return send({});
+        }
+        if (url.pathname === "/auth/v1/verify") {
+          const input = JSON.parse(bytes.toString());
+          const id = [fixtureOwner, fixtureOther].find(id => fixtureUser(id).email === input.email);
+          if (!id || input.token !== "123456" || input.type !== "email") return send({ message: "Invalid synthetic OTP", code: "otp_expired" }, 400);
+          const session = JSON.parse(Buffer.from(fixtureCookie(id).value.slice(7), "base64url").toString());
+          return send(session);
+        }
         if (url.pathname === "/__fixture/revoke-staff") { await db.exec("reset role"); await sql("update booking_private.staff_roles set revoked_at=now() where user_id=$1", [fixtureOwner]); return send({ ok: true }); }
         if (url.pathname.startsWith("/storage/v1/object")) {
           if (request.headers.apikey !== adminFixtureSecret) return send({ message: "Private Storage denied" }, 403);

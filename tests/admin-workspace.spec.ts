@@ -3,6 +3,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { fixtureCookie, fixtureOther } from "../scripts/workspace-fixture.mjs";
 import { fixturePdf, adminFixtureSecret } from "../scripts/admin-fixture.mjs";
 import { artifact } from "./artifacts";
+import { fixtureUser, fixtureOwner } from "../scripts/workspace-fixture.mjs";
 test.skip(process.env.ADMIN_WORKSPACE_FIXTURE !== "true", "Requires disposable PostgreSQL and loopback Auth/Storage; never run against hosted accounts.");
 const origin = "http://127.0.0.1:3100", paid = process.env.ADMIN_FIXTURE_PAID_ORDER!, pending = process.env.ADMIN_FIXTURE_PENDING_ORDER!, unpaid = process.env.ADMIN_FIXTURE_UNPAID_ORDER!;
 async function signIn(context: BrowserContext, owner?: string) { await context.addCookies([fixtureCookie(owner) as Parameters<BrowserContext["addCookies"]>[0][number]]); await context.route("**/*", route => new URL(route.request().url()).hostname === "127.0.0.1" ? route.continue() : route.abort()); }
@@ -10,6 +11,41 @@ test.beforeEach(async ({ context }) => { await signIn(context); });
 async function save(page: Page) { await page.getByRole("button", { name: "Save draft", exact: true }).first().click(); await expect(page.getByRole("status").filter({ hasText: "Draft saved." })).toBeVisible(); }
 async function publish(page: Page) { await page.getByRole("button", { name: "Review publication", exact: true }).click(); await page.getByLabel("I have reviewed this saved revision and approve this change.").check(); await page.getByRole("button", { name: "Publish saved revision", exact: true }).click(); await expect(page.getByRole("status").filter({ hasText: "Published." })).toBeVisible(); }
 async function openSection(page: Page, id: string) { const detail = page.locator(id); if (!await detail.evaluate(element => (element as HTMLDetailsElement).open)) await detail.locator(":scope > summary").click(); }
+
+test("LOCAL staff entry: anonymous redirect, OTP, safe return, denial and admin logout", async ({ page, context }) => {
+  test.setTimeout(120000);
+  await context.clearCookies();
+  await page.goto("/admin/orders");
+  await expect(page).toHaveURL(/\/admin-login\?next=%2Fadmin%2Forders$/);
+  await expect(page.getByRole("heading", { level: 1, name: "Admin Sign-In", exact: true })).toBeVisible();
+  await expect(page.getByRole("navigation", { name: "Staff navigation", exact: true })).toHaveCount(0);
+  for (const width of [320, 390, 1440]) { await page.setViewportSize({ width, height: 900 }); expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true); }
+  expect((await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations).toEqual([]);
+  await page.screenshot({ path: artifact("admin-login-desktop.png") });
+  await page.getByLabel("Account email", { exact: true }).fill(fixtureUser(fixtureOwner).email);
+  await page.getByRole("button", { name: "Send verification code", exact: true }).click();
+  const code = page.getByLabel("6-digit verification code", { exact: true });
+  await expect(code).toBeFocused();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.screenshot({ path: artifact("admin-login-otp-mobile.png") });
+  await code.fill("000000"); await page.getByRole("button", { name: "Verify email", exact: true }).click();
+  await expect(page.getByRole("main").getByRole("alert")).toContainText("incorrect or has expired");
+  await code.fill("123456"); await page.getByRole("button", { name: "Verify email", exact: true }).click();
+  await expect(page).toHaveURL(/\/admin\/orders$/);
+  await page.getByRole("button", { name: "Sign out", exact: true }).click();
+  await expect(page).toHaveURL(/\/admin-login$/);
+  await expect(page.getByLabel("Account email", { exact: true })).toBeVisible();
+  await page.getByLabel("Account email", { exact: true }).fill(fixtureUser(fixtureOther).email);
+  await page.getByRole("button", { name: "Send verification code", exact: true }).click();
+  await page.getByLabel("6-digit verification code", { exact: true }).fill("123456");
+  await page.getByRole("button", { name: "Verify email", exact: true }).click();
+  await expect(page.getByRole("main").getByRole("alert")).toContainText("does not have active staff access");
+  expect((await (await page.request.get("/api/staff-auth/session")).json()).allowed).toBe(false);
+  expect((await (await page.request.get("/api/auth/session")).json()).user).toBeNull();
+  await signIn(context, fixtureOther); await page.reload();
+  await expect(page.getByRole("heading", { name: "Staff Access Required", exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Open admin workspace", exact: true })).toHaveCount(0);
+});
 
 test("LOCAL PostgreSQL: staff dashboard, paid queues, order filters and pagination", async ({ page }) => {
   await page.goto("/admin"); await expect(page.getByRole("heading", { name: "Operations Overview", exact: true })).toBeVisible();

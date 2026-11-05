@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { accountRequest, safeReturnPath, type Customer } from "@/lib/account";
+import { accountRequest, safeCustomerReturnPath, type Customer } from "@/lib/account";
 
 type Session = {
   configured: boolean;
@@ -46,10 +46,12 @@ export function useCustomer() {
 
 export function OtpSignIn({
   initialEmail = "",
+  staffOnly = false,
   otpLength,
   onVerified,
 }: {
   initialEmail?: string;
+  staffOnly?: boolean;
   otpLength: number;
   onVerified: (customer: Customer) => void;
 }) {
@@ -87,7 +89,7 @@ export function OtpSignIn({
     setBusy(true);
     setError("");
     try {
-      await accountRequest("/api/auth/send", { email: email.trim() });
+      await accountRequest(staffOnly ? "/api/staff-auth/send" : "/api/auth/send", { email: email.trim() });
       setSent(true);
       setToken("");
       deadline.current = Date.now() + 60000;
@@ -109,7 +111,7 @@ export function OtpSignIn({
     setError("");
     try {
       const result = await accountRequest<{ user: Customer }>(
-        "/api/auth/verify",
+        staffOnly ? "/api/staff-auth/verify" : "/api/auth/verify",
         { email: email.trim(), token },
       );
       setToken("");
@@ -133,10 +135,11 @@ export function OtpSignIn({
         }
       }}
     >
-      <h3>Verify your email</h3>
+      {staffOnly ? <h2>Verify your admin email</h2> : <h3>Verify your email</h3>}
       <p>
-        We’ll email you a verification code to securely sign in or create your
-        account. No password needed.
+        {staffOnly
+          ? "Enter the email linked to your existing admin account. Use the emailed code to continue; no password is needed."
+          : "We’ll email you a verification code to securely sign in or create your account. No password needed."}
       </p>
       <label htmlFor="auth-email">Account email</label>
       <input
@@ -239,7 +242,7 @@ export function AccountUnavailable() {
   );
 }
 
-export function LogoutButton({ onLogout }: { onLogout?: () => void }) {
+export function LogoutButton({ onLogout, returnTo = "/login" }: { onLogout?: () => void; returnTo?: "/login" | "/admin-login" }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   return (
@@ -257,8 +260,7 @@ export function LogoutButton({ onLogout }: { onLogout?: () => void }) {
             if (onLogout) onLogout();
             else {
               // A full navigation drops private client Router Cache after sign-out.
-              // eslint-disable-next-line @next/next/no-location-assign-relative-destination
-              window.location.assign("/login");
+              window.location.assign(returnTo);
             }
           } catch {
             setError("Sign-out failed. Please retry.");
@@ -291,7 +293,7 @@ export function LoginForm() {
   const { session, error, setCustomer } = useCustomer();
   const router = useRouter();
   const params = useSearchParams();
-  const destination = safeReturnPath(params.get("next"));
+  const destination = safeCustomerReturnPath(params.get("next"));
   if (error) return <p role="alert">{error}</p>;
   if (!session) return <p role="status">Checking your session…</p>;
   if (!session.configured) return <AccountUnavailable />;

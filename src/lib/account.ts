@@ -57,6 +57,16 @@ export function safeReturnPath(value: string | null | undefined) {
   return "/account/orders";
 }
 
+// Separate entry points cannot bounce into the other workspace or external URLs.
+export function safeCustomerReturnPath(value: string | null | undefined) {
+  const path = safeReturnPath(value);
+  return path === "/admin" || path.startsWith("/admin/") ? "/account/orders" : path;
+}
+export function safeAdminReturnPath(value: string | null | undefined) {
+  const path = safeReturnPath(value);
+  return path === "/admin" || path.startsWith("/admin/") ? path : "/admin";
+}
+
 export async function accountRequest<T>(
   path: string,
   body?: unknown,

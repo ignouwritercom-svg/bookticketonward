@@ -1,5 +1,11 @@
 # Routes and links
 
+## Separate customer and admin entry — 5 November 2026
+
+Customer sign-in remains `/login`; staff use the direct `/admin-login` URL. No public header, footer, marketing page or sitemap advertises the staff entry. The staff screen sits outside the admin workspace layout, so an anonymous visitor sees no workspace navigation. Unauthenticated configured staff routes redirect to this entry with an allowlisted admin return destination; customer login accepts only customer/booking return destinations. Admin sign-out returns to `/admin-login`.
+
+`/api/staff-auth/session`, `/send` and `/verify` use the existing verified Supabase identity and OTP configuration. Staff OTP requests disable account creation, verification independently checks `is_booking_staff`, and denied verification signs the local session out. Existing staff page/API/RPC checks remain independent of the entry URL. The new page/API have private no-store/noindex headers; the existing index-enabled robots policy lets crawlers observe HTML noindex and blocks API crawling. No new credential, role, migration or payment capability is introduced.
+
 ## Admin information architecture — 5 November 2026
 
 Existing staff routes now share grouped navigation, route-safe breadcrumbs, related-module links and a section-search dialog. The canonical route model is `src/lib/admin-navigation.ts`; it contains only static admin destinations and does not expose record identifiers in breadcrumb labels. Editorial collection query state is reflected in active links through small isolated Suspense boundaries. Mobile navigation is a modal drawer; native fallback links remain for no-JavaScript use. No route, redirect, authentication, API or database change is required by this refinement.
