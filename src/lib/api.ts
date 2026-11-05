@@ -15,7 +15,7 @@ export function failure(message: string, status = 400) {
 }
 export const unavailable = () =>
   failure(
-    "Account services are unavailable. Supabase setup is required; your details have not been saved.",
+    "Account services are currently unavailable. Please try again later; this action has not saved your details.",
     503,
   );
 
@@ -27,7 +27,7 @@ export function sameOrigin(request: Request) {
   return request.headers.get("origin") === expectedOrigin;
 }
 
-export async function readBody(request: Request) {
+export async function readBody(request: Request, maxBytes = 32768) {
   if (
     !sameOrigin(request) ||
     !request.headers.get("content-type")?.startsWith("application/json")
@@ -42,7 +42,7 @@ export async function readBody(request: Request) {
     const { done, value } = await reader.read();
     if (done) break;
     size += value.byteLength;
-    if (size > 32768) {
+    if (size > maxBytes) {
       await reader.cancel();
       throw new Error("request");
     }

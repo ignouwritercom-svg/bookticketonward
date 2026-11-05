@@ -9,9 +9,9 @@ export const metadata: Metadata = {
 export default function LoginPage() {
   return (
     <main id="main-content" tabIndex={-1} className="account-page account-login">
-      <p className="eyebrow">YOUR CUSTOMER ACCOUNT</p>
+      <p className="eyebrow">Your customer account</p>
       <h1>
-        Welcome back<span>.</span>
+        Welcome Back
       </h1>
       <p>Sign in to resume your saved booking and view your orders.</p>
       <Suspense fallback={<p role="status">Loading sign-in…</p>}>

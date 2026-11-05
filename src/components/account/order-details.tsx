@@ -4,6 +4,7 @@ import { itinerarySectors } from "@/lib/booking";
 import { formatTravelDate } from "@/lib/trip";
 import type { Order } from "@/lib/account";
 import { paymentLabels, fulfilmentLabels, documentKindLabels, type OrderDocument } from "@/lib/documents";
+import { OrderProgress } from "./order-progress";
 
 export function OrderDetails({ order, documents = [], documentsError = false, showDocuments = true, staffView = false }: { order: Order; documents?: OrderDocument[]; documentsError?: boolean; showDocuments?: boolean; staffView?: boolean }) {
   const booking = order.booking_snapshot;
@@ -14,7 +15,7 @@ export function OrderDetails({ order, documents = [], documentsError = false, sh
       <section className="account-card">
         <header>
           <div>
-            <p className="eyebrow">{staffView ? "CUSTOMER ORDER" : "YOUR ORDER"}</p>
+            <p className="eyebrow">{staffView ? "Customer order" : "Your order"}</p>
             <h1>{order.reference}</h1>
             <p>
               Created{" "}
@@ -52,10 +53,11 @@ export function OrderDetails({ order, documents = [], documentsError = false, sh
           </div>
         </dl>
         {order.payment_status === "awaiting_payment" && <p>
-          Payments are not enabled yet. Your order has been saved; no
-          reservation has been issued and fulfilment has not started.
+          Online payments are currently unavailable. Your order has been saved;
+          no reservation has been issued and document preparation has not started.
         </p>}
       </section>
+      {!staffView && <OrderProgress order={order} />}
       {service!=="hotel" && <section className="account-card">
         <h2>Your itinerary</h2>
         <p>
@@ -150,7 +152,7 @@ export function OrderDetails({ order, documents = [], documentsError = false, sh
       </section>}
       <section className="account-card">
         <h2>Accepted service policy</h2>
-        <p className="account-muted">Version {order.policy_version}</p>
+        {staffView && <p className="account-muted">Version {order.policy_version}</p>}
         <p>{order.policy_snapshot}</p>
       </section>
     </>

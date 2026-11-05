@@ -40,6 +40,10 @@ export function bookingFingerprint(value: unknown) {
 
 export function safeReturnPath(value: string | null | undefined) {
   if (!value) return "/account/orders";
+  if (["/admin/documents", "/admin/customers", "/admin/content", "/admin/content/new", "/admin/settings", "/admin/activity"].includes(value)) return value;
+  if (/^\/admin\/customers\/[0-9a-f-]{36}$/i.test(value) && uuidPattern.test(value.split("/").at(-1)!)) return value;
+  if (/^\/admin\/editor\/(?:(?:page|guide|destination)--[a-z0-9]+(?:-[a-z0-9]+)*|settings--site|pricing--catalog|policies--booking)(?:\/preview)?$/.test(value) && value.length < 150) return value;
+  if (["/account", "/account/drafts", "/account/documents", "/account/settings", "/account/help"].includes(value)) return value;
   if (value === "/admin" || value === "/admin/orders" || value === "/admin/notifications" || value === "/account/notifications") return value;
   if (/^\/admin\/orders\/[0-9a-f-]{36}$/i.test(value) && uuidPattern.test(value.split("/").at(-1)!)) return value;
   if (value === "/account/orders" || value === "/book") return value;

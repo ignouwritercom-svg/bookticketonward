@@ -1,0 +1,12 @@
+# Location reference catalogue
+
+This is a derived, offline snapshot used for airport, hotel-destination city and country name suggestions. It is not a flight schedule, fare, hotel-property list, inventory, availability feed or confirmation service. Missing/outdated locations can still be entered manually.
+
+- **OurAirports:** airports/countries, [source and Public Domain terms](https://ourairports.com/data/). Only IATA-coded large/medium airports and scheduled small airports are included; closed airports/heliports/seaplane bases are excluded. Airport values are city/name + IATA code, capped to the existing 100-character form limit.
+- **GeoNames:** cities15000, administrative-region labels and country aliases, [source/field definitions](https://download.geonames.org/export/dump/readme.txt), licensed under [Creative Commons Attribution 4.0](https://creativecommons.org/licenses/by/4.0/). Dataset attribution: GeoNames, https://www.geonames.org/. Derived changes: exclude city subdivisions (`PPLX`), retain selected fields, normalise search aliases, combine region/country labels, bound form values and compress. No endorsement is implied. Data is supplied without a completeness/accuracy guarantee.
+
+`locations.manifest.json` records download time, source URLs and SHA-256 digests, counts and the compressed snapshot digest. The committed `locations.json.gz` is loaded once per server process and is never imported by a client module or served as a public asset. Responses expose at most eight public name suggestions; search indexes/weights stay server-side.
+
+Refresh manually from the project root with `python scripts/update-location-data.py` (Python standard library; not needed by npm build/runtime). Inspect the source changes, manifest/counts and run location/browser checks before committing. Restart the local server after refreshing to reload its in-memory snapshot. Refreshing does not modify the database or any booking. Deployment must retain the snapshot; the API route has an explicit Next.js output-file-tracing include.
+
+Public attribution links, licence and an adaptation notice are available in the common footer's collapsed “Data credits” disclosure, including without JavaScript. Supplier names do not appear beside booking/homepage inputs. The application queries its own server, not these sources, while the customer types. No environment key or external request is needed at runtime.

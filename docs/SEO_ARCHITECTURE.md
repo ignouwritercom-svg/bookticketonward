@@ -1,8 +1,24 @@
 # Public content and technical SEO
 
+## Public App Shell cache correction — 5 November 2026
+
+The public snapshot cache now uses `stale: 300`, retaining server `revalidate: 60` and `expire: 300`. Installed Next 16.4.2 distinguishes the 30-second prerender threshold from the 300-second App Shell threshold. The former value could fail development/partial-prefetch validation at `Home -> publicSite`, even while production builds passed. Fixing the shared profile preserves homepage/metadata/footer server HTML without disabling root validation or replacing content with an empty streaming fallback. Publication invalidation remains; order repricing is still uncached. Existing open browser views can retain old public copy until refreshed or their five-minute client lifetime expires.
+
+With `npm run dev` already running, `node scripts/check-public-dev.mjs` performs read-only direct homepage/pricing/service and return-home navigation checks on localhost:3000. It does not restart the server, read environment files, authenticate or mutate hosted records. It checks visible content and development error output; it does not replace manual Navigation Inspector or hosted-cache testing.
+
+## Managed publication layer — 5 November 2026
+
+The optional staff-managed content layer feeds the existing public templates, canonical metadata, Open Graph/Article/Breadcrumb content, guide/destination collections and sitemap. Draft revisions and private previews never enter that layer. Core page slugs and the approved production origin remain fixed. Published article withdrawals remove collection/sitemap entries and resolve to pre-stream 404s; a provider outage yields 503 rather than a false missing-page signal. New staff/customer-management routes inherit independent authentication and noindex/no-store and are excluded from public discovery.
+
+Publication validates local link targets, unique headings/FAQ questions/titles, dates and safe source/link schemes; editorial truth, legal approval and source review remain human tasks. Page-level provisional/noindex state and the global indexing gate still apply. Public tagged caching keeps content in prerendered HTML; publishing expires it, while uncached order repricing guards against old browser views. Details: [ADMIN_WORKSPACE.md](ADMIN_WORKSPACE.md).
+
 Phase 6, reviewed 3 November 2026. Local implementation only; no deployment or payment integration.
 
+Presentation review, 4 November 2026: customer copy and metadata no longer carry implementation-phase or owner-approval tasks. The three policy pages still display an explicit provisional notice; contact supplies self-service help with accurate direct-contact availability. Their existing `draft` flags/noindex and sitemap exclusions remain unchanged, including when the launch switch is enabled. This is not policy approval or production indexing authorization. Owner requirements are in [LAUNCH_READINESS.md](LAUNCH_READINESS.md).
+
 Phase 7 adds `/account/notifications` and `/admin/notifications`, plus their POST-only acknowledgment/retry APIs. They inherit private account/staff noindex policies, no-store proxy/response headers and fresh authorization; notification rows have owner RLS and logs/retries require staff RPC authorization. None is in the public route registry or sitemap. No robots rule is used as an access control. The draft privacy page now describes transactional account emails and activity read state without claiming production sending is enabled.
+
+Customer workspace expansion, 5 November 2026: `/account`, `/account/drafts`, `/account/documents`, `/account/settings` and `/account/help` inherit the existing account noindex/no-store rules and independently authenticate each request. They are linked through private account navigation and remain excluded from the public registry/sitemap. `POST /api/account/workspace` returns authenticated owner summaries with no-store/noindex; filter references stay out of URLs. No new public canonical or structured-data claim is introduced. See [CUSTOMER_WORKSPACE.md](CUSTOMER_WORKSPACE.md).
 
 ## Origin and launch controls
 
@@ -23,6 +39,9 @@ Preview robots disallows all crawling and the sitemap is empty. Live robots allo
 
 ## Content structure
 
+- Dedicated brand/help/policy pass (5 November 2026): added `/about` and its source in `src/content/about.ts`, linked through the shared footer. The 18-URL public registry includes its canonical/date. `PublicContent.presentation` selects six server-rendered page families through `BrandPage`; Articles and existing feature components remain. AboutPage/ContactPage JSON-LD replaces generic WebPage on those two matching visible page types; no fabricated Organization credentials/contact data is added. Concise policy/contact H1 titles remain shared with metadata. Draft/noindex/sitemap exclusions and private access controls are unchanged. Research is recorded in `PUBLIC_PAGE_REDESIGN.md`.
+- Public content expansion (5 November 2026): `src/content/depth.ts` composes page-specific overviews, decision cards, ordered walkthroughs and checklists into all 16 editorial exports. `types.ts` validates their structure at compile time. Additions are server-rendered plain text/links; no raw CMS HTML, hidden keyword blocks, fabricated author/review/rating or FAQ rich-result claim. Existing titles/canonicals and draft/indexing controls remain. Review dates now reflect this editorial pass; home registry date is updated too.
+- `src/components/public/home-planning.tsx` provides the server-rendered service explanation and guide/destination library. It reads actual guide exports so titles and links remain aligned. Its CSS and the editorial stylesheet use distinct selectors; no new client bundle dependency, remote font or tracking script was added.
 - `src/content/types.ts`: shared page, section, FAQ, destination, source and guide contracts. Content is plain structured text, not arbitrary CMS HTML.
 - `src/content/pages.ts`: 11 public index/service/help/policy pages, draft flags and contextual links.
 - `src/content/destinations.ts`: France and United Kingdom, including country/slug, substantial country-specific notes, official sources, reviewed dates, FAQs and related guide slugs.

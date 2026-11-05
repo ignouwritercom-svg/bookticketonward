@@ -15,12 +15,12 @@
 }
 .booking-intro h1 {
   font-size: clamp(32px, 4vw, 44px);
-  letter-spacing: -1.8px;
+  letter-spacing: -0.025em;
 }
 .booking-intro > p:last-child {
   color: var(--muted);
   margin-top: 12px;
-  font-size: 14px;
+  font-size: var(--text-base);
 }
 .booking-progress {
   margin-bottom: 24px;
@@ -38,7 +38,7 @@
   align-items: center;
   gap: 10px;
   color: #60716a;
-  font-size: 13px;
+  font-size: var(--text-caption);
   border-bottom: 2px solid #dce5de;
   padding-bottom: 16px;
 }
@@ -49,7 +49,7 @@
   height: 29px;
   border: 1px solid #b8c9bf;
   border-radius: 50%;
-  font-size: 12px;
+  font-size: var(--text-caption);
   flex-shrink: 0;
 }
 .booking-progress li[aria-current] {
@@ -74,7 +74,7 @@
   display: flex;
   align-items: start;
   gap: 10px;
-  font-size: 12px;
+  font-size: var(--text-sm);
   color: #52695d;
   margin: 0 0 25px;
 }
@@ -103,17 +103,17 @@
   margin-bottom: 10px;
 }
 .booking-panel-heading h2 {
-  font-size: 28px;
-  letter-spacing: -0.8px;
+  font-size: 1.75rem;
+  letter-spacing: -0.025em;
   scroll-margin-top: 110px;
 }
 .booking-panel-heading > p:last-child {
-  font-size: 13px;
+  font-size: var(--text-base);
   color: var(--muted);
   margin-top: 8px;
 }
 .booking-help {
-  font-size: 13px;
+  font-size: var(--text-base);
   color: var(--muted);
   margin-bottom: 24px;
   line-height: 1.8;
@@ -125,12 +125,12 @@
 }
 .booking-trip-types > legend,
 .delivery-choices > legend {
-  font-size: 13px;
+  font-size: var(--text-sm);
   font-weight: 600;
   margin-bottom: 12px;
 }
 .booking-trip-types .trip-type span {
-  font-size: 13px;
+  font-size: var(--text-sm);
   padding: 10px 15px;
 }
 .booking-entry {
@@ -142,7 +142,7 @@
   position: relative;
 }
 .booking-entry > legend {
-  font-size: 14px;
+  font-size: var(--text-sm);
   font-weight: 600;
   padding: 0 8px;
   margin-left: -8px;
@@ -157,7 +157,7 @@
   gap: 6px;
   align-items: center;
   padding: 6px 0 6px 8px;
-  font-size: 12px;
+  font-size: var(--text-sm);
   color: #7c4541;
   background: none;
 }
@@ -175,7 +175,7 @@
 }
 .booking-field label {
   display: block;
-  font-size: 12px;
+  font-size: var(--text-sm);
   font-weight: 600;
   line-height: 1.5;
   margin-bottom: 8px;
@@ -184,7 +184,7 @@
 .booking-field select,
 .booking-field textarea {
   font: inherit;
-  font-size: 14px;
+  font-size: var(--text-base);
   line-height: 1.5;
   width: 100%;
   min-width: 0;
@@ -211,12 +211,12 @@
 }
 .field-hint {
   color: #5b6f63;
-  font-size: 11px;
+  font-size: var(--text-caption);
   line-height: 1.7;
   margin-top: 7px;
 }
 .booking-field .field-error {
-  font-size: 12px;
+  font-size: var(--text-sm);
 }
 .booking-add-row {
   display: flex;
@@ -226,7 +226,7 @@
   margin-top: 22px;
 }
 .booking-add-row > span {
-  font-size: 11px;
+  font-size: var(--text-sm);
   color: var(--muted);
 }
 .button-secondary {
@@ -253,7 +253,7 @@
   background: #eef5f0;
   color: #466451;
   border-radius: 6px;
-  font-size: 12px;
+  font-size: var(--text-sm);
   line-height: 1.8;
   margin-top: 24px;
 }
@@ -268,7 +268,7 @@
   display: flex;
   gap: 10px;
   align-items: start;
-  font-size: 13px;
+  font-size: var(--text-sm);
   cursor: pointer;
 }
 .booking-checkbox input {
@@ -299,7 +299,7 @@
   border: 1px solid #bccfc2;
   border-radius: 6px;
   padding: 17px;
-  font-size: 13px;
+  font-size: var(--text-sm);
   cursor: pointer;
 }
 .delivery-choices label:has(input:checked) {
@@ -318,7 +318,7 @@
 }
 .delivery-information strong {
   color: var(--foreground);
-  font-size: 13px;
+  font-size: var(--text-sm);
 }
 .delivery-information p {
   margin-top: 7px;
@@ -333,7 +333,7 @@
   padding-top: 25px;
 }
 .booking-start-note {
-  font-size: 11px;
+  font-size: var(--text-sm);
   color: var(--muted);
 }
 .booking-errors {
@@ -341,7 +341,7 @@
   border-left: 3px solid #af382d;
   background: #fff5f2;
   color: #8e3027;
-  font-size: 13px;
+  font-size: var(--text-sm);
   margin-bottom: 22px;
 }
 .booking-sidebar {
@@ -359,7 +359,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 16px;
+  font-size: var(--text-base);
   font-weight: 600;
   padding: 21px 23px;
   list-style: none;
@@ -380,7 +380,7 @@
   display: inline-block;
   color: var(--teal-dark);
   background: #edf5ef;
-  font-size: 11px;
+  font-size: var(--text-sm);
   border-radius: 4px;
   padding: 4px 8px;
 }
@@ -397,7 +397,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 12px;
+  font-size: var(--text-sm);
   overflow-wrap: anywhere;
 }
 .summary-body li strong {
@@ -406,7 +406,7 @@
 }
 .summary-body li > span {
   display: block;
-  font-size: 11px;
+  font-size: var(--text-sm);
   color: var(--muted);
   margin-top: 6px;
 }
@@ -414,7 +414,7 @@
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  font-size: 12px;
+  font-size: var(--text-sm);
   margin-top: 12px;
 }
 .summary-price-line > span:first-child {
@@ -430,18 +430,18 @@
   border-top: 1px solid var(--line);
 }
 .summary-total > span {
-  font-size: 13px;
+  font-size: var(--text-sm);
   font-weight: 600;
 }
 .summary-total small {
   display: block;
-  font-size: 10px;
+  font-size: var(--text-caption);
   font-weight: 400;
   color: var(--muted);
 }
 .summary-total > strong {
-  font-size: 28px;
-  letter-spacing: -1px;
+  font-size: 1.75rem;
+  letter-spacing: -0.025em;
 }
 .summary-body > .field-hint {
   margin-top: 15px;
@@ -451,12 +451,12 @@
   align-items: center;
   gap: 10px;
   color: var(--teal-dark);
-  font-size: 12px;
+  font-size: var(--text-sm);
   padding: 22px 10px 14px;
 }
 .summary-preview-note {
   color: var(--muted);
-  font-size: 11px;
+  font-size: var(--text-sm);
   padding: 0 10px;
 }
 .review-section {
@@ -474,11 +474,11 @@
   margin-bottom: 18px;
 }
 .review-title h3 {
-  font-size: 16px;
+  font-size: var(--text-base);
 }
 .review-title button {
   flex-shrink: 0;
-  font-size: 12px;
+  font-size: var(--text-sm);
 }
 .review-sectors {
   list-style: none;
@@ -498,7 +498,7 @@
   height: 25px;
   border: 1px solid #c7d7cd;
   border-radius: 50%;
-  font-size: 11px;
+  font-size: var(--text-caption);
   flex-shrink: 0;
 }
 .review-sectors li > div {
@@ -509,13 +509,13 @@
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
-  font-size: 14px;
+  font-size: var(--text-sm);
 }
 .review-sectors strong {
   font-weight: 600;
 }
 .review-sectors li div > span {
-  font-size: 12px;
+  font-size: var(--text-sm);
   color: var(--muted);
 }
 .review-passenger {
@@ -523,7 +523,7 @@
 }
 .review-passenger h4 {
   font-weight: 600;
-  font-size: 14px;
+  font-size: var(--text-sm);
   margin: 0 0 10px;
 }
 .review-passenger dl {
@@ -535,11 +535,11 @@
   margin: 0;
 }
 .review-section dt {
-  font-size: 11px;
+  font-size: var(--text-caption);
   color: var(--muted);
 }
 .review-section dd {
-  font-size: 13px;
+  font-size: var(--text-sm);
   margin: 3px 0 0;
 }
 .review-contact {
@@ -558,13 +558,13 @@
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  font-size: 13px;
+  font-size: var(--text-sm);
 }
 .review-price strong {
-  font-size: 22px;
+  font-size: 1.375rem;
 }
 .review-price small {
-  font-size: 11px;
+  font-size: var(--text-caption);
   color: var(--muted);
   font-weight: 400;
 }
@@ -574,12 +574,12 @@
   margin: 24px 0;
 }
 .draft-terms summary {
-  font-size: 13px;
+  font-size: var(--text-sm);
   font-weight: 600;
   padding: 15px 18px;
 }
 .draft-terms > div {
-  font-size: 12px;
+  font-size: var(--text-sm);
   color: #53695b;
   padding: 0 18px 17px;
 }
@@ -596,7 +596,7 @@
   align-items: center;
   gap: 25px;
   padding-block: 24px;
-  font-size: 11px;
+  font-size: var(--text-sm);
   color: var(--muted);
 }
 .booking-footer > span {
@@ -673,7 +673,7 @@
     margin-top: 10px;
   }
   .booking-progress li {
-    font-size: 12px;
+    font-size: var(--text-caption);
     gap: 8px;
   }
 }
@@ -682,11 +682,11 @@
     min-height: 72px;
   }
   .booking-header .text-link {
-    font-size: 11px;
+    font-size: var(--text-sm);
     gap: 6px;
   }
   .booking-header .brand {
-    font-size: 20px;
+    font-size: 1.25rem;
   }
   .booking-header .brand-mark {
     width: 30px;
@@ -697,10 +697,10 @@
     padding-top: 32px;
   }
   .booking-intro h1 {
-    font-size: 33px;
+    font-size: 2rem;
   }
   .booking-intro > p:last-child {
-    font-size: 13px;
+    font-size: var(--text-base);
   }
   .booking-progress ol {
     gap: 10px;
@@ -708,7 +708,7 @@
   .booking-progress li {
     flex-direction: column;
     align-items: start;
-    font-size: 10px;
+    font-size: var(--text-caption);
     line-height: 1.5;
     gap: 8px;
   }
@@ -717,13 +717,13 @@
     height: 27px;
   }
   .temporary-draft {
-    font-size: 11px;
+    font-size: var(--text-sm);
   }
   .booking-panel {
     padding: 24px 18px;
   }
   .booking-panel-heading h2 {
-    font-size: 26px;
+    font-size: 1.625rem;
   }
   .booking-fields-grid {
     grid-template-columns: 1fr;
@@ -732,20 +732,20 @@
   .booking-field input,
   .booking-field textarea,
   .booking-field select {
-    font-size: 16px;
+    font-size: var(--text-base);
   }
   .booking-entry {
     padding: 18px 14px;
   }
   .booking-trip-types .trip-type span {
-    font-size: 12px;
+    font-size: var(--text-sm);
     padding: 9px 10px;
   }
   .booking-help {
-    font-size: 12px;
+    font-size: var(--text-base);
   }
   .booking-checkbox {
-    font-size: 12px;
+    font-size: var(--text-sm);
   }
   .booking-form-actions {
     flex-direction: column-reverse;
@@ -765,10 +765,10 @@
   .delivery-choices label {
     padding: 14px 10px;
     gap: 8px;
-    font-size: 12px;
+    font-size: var(--text-sm);
   }
   .booking-note {
-    font-size: 11px;
+    font-size: var(--text-sm);
     padding: 14px;
   }
   .summary-body {
@@ -776,25 +776,25 @@
     gap: 10px 18px;
   }
   .summary-body li p {
-    font-size: 11px;
+    font-size: var(--text-sm);
     flex-wrap: wrap;
   }
   .summary-body li > span {
-    font-size: 10px;
+    font-size: var(--text-sm);
   }
   .summary-total {
     align-items: end;
   }
   .summary-total strong {
-    font-size: 22px;
+    font-size: 1.375rem;
   }
   .summary-total > span,
   .summary-price-line {
-    font-size: 11px;
+    font-size: var(--text-sm);
   }
   .booking-summary > summary {
     padding: 17px 18px;
-    font-size: 14px;
+    font-size: var(--text-sm);
   }
   .review-passenger dl {
     grid-template-columns: 1fr 1fr;
@@ -812,7 +812,7 @@
     gap: 12px;
   }
   .review-title h3 {
-    font-size: 15px;
+    font-size: var(--text-base);
   }
   .booking-footer {
     align-items: start;
@@ -845,3 +845,7 @@
   }
 }
 .booking-controls { display: contents; border: 0; padding: 0; margin: 0; min-width: 0; }
+@media (max-width: 480px) {
+  .booking-progress ol { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 16px; }
+  .booking-progress li { flex-direction: row; align-items: center; font-size: var(--text-caption); }
+}

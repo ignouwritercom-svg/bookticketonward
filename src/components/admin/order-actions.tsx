@@ -10,6 +10,9 @@ export function OrderActions({ order, documents, storageConfigured }: { order: O
   const [note,setNote] = useState("");
   const [delivery,setDelivery] = useState("");
   const [documentId,setDocumentId] = useState("");
+  const [confirmation, setConfirmation] = useState<{ action: "publish" | "withdraw" | "abort"; id: string; version: number } | null>(null);
+  const [reviewed, setReviewed] = useState(false);
+  const status = useRef<HTMLParagraphElement>(null);
   const service=order.booking_snapshot.service ?? "flight";
   const [kind,setKind]=useState(service==="hotel" ? "hotel" : service==="combo" ? "combined" : "flight");
   const file = useRef<HTMLInputElement>(null);
@@ -21,9 +24,10 @@ export function OrderActions({ order, documents, storageConfigured }: { order: O
     try {
       await accountRequest(`/api/admin/orders/${order.id}`, { action, documentId:id, ...(action==="note" ? {note} : {}) });
       if(action==="note") setNote("");
+      setConfirmation(null); setReviewed(false);
       setDelivery(""); setMessage("Saved. Refreshing order history…"); router.refresh();
     } catch(e) { setMessage(e instanceof Error ? e.message : "Unable to save. Please retry."); }
-    finally { inFlight.current=false; setBusy(false); }
+    finally { inFlight.current=false; setBusy(false); requestAnimationFrame(() => status.current?.focus()); }
   }
   async function upload() {
     if(inFlight.current) return;
@@ -36,11 +40,11 @@ export function OrderActions({ order, documents, storageConfigured }: { order: O
       if(file.current) file.current.value="";
       setMessage("PDF uploaded privately. Publish it separately when it is ready for the customer."); router.refresh();
     } catch(e) { setMessage(e instanceof Error ? e.message : "Upload could not be confirmed. Refresh history before retrying."); router.refresh(); }
-    finally { inFlight.current=false; setBusy(false); }
+    finally { inFlight.current=false; setBusy(false); requestAnimationFrame(() => status.current?.focus()); }
   }
   const published = documents.filter(d=>d.state==="ready" && d.published_at && !d.withdrawn_at);
   return <div className="admin-controls">
-    <p role="status" aria-live="polite">{message}</p>
+    <p ref={status} tabIndex={-1} role="status" aria-live="polite">{message}</p>
     <section className="account-card"><h2>Fulfilment actions</h2>
       {!paid ? <p>Verified payment is required. There is no manual payment confirmation action.</p> : <>
         {order.fulfilment_status==="not_started" && <button type="button" className="button button-primary" disabled={busy} onClick={()=>void action("start")}>Start processing</button>}
@@ -51,11 +55,13 @@ export function OrderActions({ order, documents, storageConfigured }: { order: O
       {!documents.length && <p>No documents uploaded.</p>}
       <ul className="admin-documents">{documents.map(d=><li key={d.id}><strong>{documentKindLabels[d.kind ?? "flight"]} · Version {d.version}</strong> · {new Date(d.created_at).toLocaleString("en-IN",{timeZone:"Asia/Kolkata"})} IST · {Math.ceil(d.size_bytes/1024)} KB
         <p>{d.state!=="ready" ? (d.state==="pending" ? "Pending confirmation — administrator reconciliation required." : "Upload failed — upload a new version.") : d.withdrawn_at ? "Withdrawn from customer downloads" : d.published_at ? "Published on customer dashboard" : "Private — not published"}</p>
+        {paid && d.state === "pending" && <div className="ops-toolbar"><button type="button" className="button button-secondary" disabled={busy} onClick={() => void action("complete", d.id)}>Retry confirmation for version {d.version}</button><button type="button" className="button button-danger" disabled={busy} onClick={() => { setConfirmation({ action: "abort", id: d.id, version: d.version }); setReviewed(false); }}>Abandon pending version {d.version}</button></div>}
         {d.state==="ready" && <div className="account-actions"><a href={`/api/documents/${d.id}`} download>Download for review</a>
-          {paid && !d.published_at && !d.withdrawn_at && <button type="button" className="button button-secondary" disabled={busy} onClick={()=>void action("publish",d.id)}>Publish version {d.version}</button>}
-          {paid && !d.withdrawn_at && <button type="button" className="button button-secondary" disabled={busy} onClick={()=>void action("withdraw",d.id)}>Withdraw version {d.version}</button>}
+          {paid && !d.published_at && !d.withdrawn_at && <button type="button" className="button button-secondary" disabled={busy} onClick={()=>{ setConfirmation({action:"publish",id:d.id,version:d.version}); setReviewed(false); }}>Publish version {d.version}</button>}
+          {paid && !d.withdrawn_at && <button type="button" className="button button-secondary" disabled={busy} onClick={()=>{ setConfirmation({action:"withdraw",id:d.id,version:d.version}); setReviewed(false); }}>Withdraw version {d.version}</button>}
         </div>}
       </li>)}</ul>
+      {confirmation && <div className="ops-confirm"><h3>{confirmation.action === "publish" ? "Publish this document?" : confirmation.action === "abort" ? "Abandon this pending upload?" : "Withdraw this document?"}</h3><p>Order {order.reference} · Version {confirmation.version}. {confirmation.action === "publish" ? "The paid order owner will be able to download this version. Check its contents before confirming." : confirmation.action === "abort" ? "This pending version will be marked failed; its audit history is retained. Any existing private bytes are not deleted by this action." : "The customer will lose download access to this version. Its history is retained."}</p><label className="ops-checkbox"><input type="checkbox" checked={reviewed} onChange={event => setReviewed(event.target.checked)} />I have reviewed this order and document version.</label><div className="ops-toolbar"><button type="button" className="button button-primary" disabled={busy || !reviewed} onClick={() => void action(confirmation.action, confirmation.id)}>{confirmation.action === "publish" ? "Confirm publication" : confirmation.action === "abort" ? "Confirm abandonment" : "Confirm withdrawal"}</button><button type="button" className="text-link" disabled={busy} onClick={() => setConfirmation(null)}>Cancel</button></div></div>}
       {!storageConfigured && <p role="status">Private document storage setup is incomplete. Uploads and downloads are unavailable.</p>}
       <label htmlFor="document-kind">Document contents</label><select id="document-kind" value={kind} onChange={e=>setKind(e.target.value)} disabled={busy}>{Object.entries(documentKindLabels).filter(([value])=>service==="combo" || value===service).map(([value,label])=><option key={value} value={value}>{label}</option>)}</select>
       {service!=="flight" && <p>Hotel PDFs must cover every hotel stay and all travellers on this order. For a combo, upload both types or one combined PDF.</p>}

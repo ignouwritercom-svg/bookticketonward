@@ -2,11 +2,13 @@
 
 import { useFormContext, useWatch } from "react-hook-form";
 import { Clock3, Mail, MessageCircle } from "lucide-react";
-import { deliveryTarget, workingHours } from "@/config/business";
+import { deliveryTarget as defaultDelivery, workingHours as defaultHours } from "@/config/business";
+import { preferenceDelivery, preferenceHours, type SitePreferences } from "@/lib/site-runtime";
 import type { BookingDraft } from "@/lib/booking";
 import { BookingField } from "./field";
 
-export function DeliveryInformation() {
+export function DeliveryInformation({ settings }: { settings?: SitePreferences }) {
+  const deliveryTarget = settings ? preferenceDelivery(settings) : defaultDelivery, workingHours = settings ? preferenceHours(settings) : defaultHours;
   return (
     <div className="booking-note delivery-information">
       <Clock3 size={19} />
@@ -26,7 +28,7 @@ export function DeliveryInformation() {
   );
 }
 
-export function CommunicationStep({ today }: { today: string }) {
+export function CommunicationStep({ today, settings }: { today: string; settings?: SitePreferences }) {
   const { register, control, clearErrors } = useFormContext<BookingDraft>();
   const channel = useWatch({ control, name: "communication.channel" });
   return (
@@ -72,8 +74,8 @@ export function CommunicationStep({ today }: { today: string }) {
         <div className="booking-note">
           <Mail size={18} />
           <p>
-            Email delivery will use your account email once it is verified in
-            the next phase. A separate delivery email is not needed.
+            Email delivery uses your account email. You’ll verify it at the
+            review step. A separate delivery email is not needed.
           </p>
         </div>
       )}
@@ -104,7 +106,7 @@ export function CommunicationStep({ today }: { today: string }) {
         maxLength={2000}
         hint="Up to 2,000 characters. Please do not enter passport numbers, payment information or other sensitive identifiers."
       />
-      <DeliveryInformation />
+      <DeliveryInformation settings={settings} />
     </>
   );
 }

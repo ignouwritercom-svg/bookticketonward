@@ -1,7 +1,8 @@
 "use client";
 
 import { ArrowRight, Pencil } from "lucide-react";
-import { policyForService, formatPrice, getReservationQuote, tripTypes, serviceLabels } from "@/config/business";
+import { business, policyForService, formatPrice, getReservationQuote, tripTypes, serviceLabels } from "@/config/business";
+import { pricingCatalog, type PublicRuntime } from "@/lib/site-runtime";
 import { HotelSummary } from "./hotel-summary";
 import { itinerarySectors, type BookingDraft } from "@/lib/booking";
 import { formatTravelDate } from "@/lib/trip";
@@ -11,13 +12,15 @@ import { DeliveryInformation } from "./communication-step";
 export function ReviewStep({
   draft,
   onEdit,
+  runtime,
 }: {
   draft: BookingDraft;
   onEdit: (step: number) => void;
+  runtime?: PublicRuntime;
 }) {
   const service=draft.service ?? "flight";
-  const bookingPolicy=policyForService(service);
-  const quote = getReservationQuote(draft.trip.type,draft.passengers.length,service,draft.hotels?.length ?? 0);
+  const bookingPolicy=policyForService(service,runtime?.policies);
+  const quote = getReservationQuote(draft.trip.type,draft.passengers.length,service,draft.hotels?.length ?? 0,runtime ? pricingCatalog(runtime.pricing) : business);
   const communication = draft.communication;
   return (
     <>
@@ -172,18 +175,18 @@ export function ReviewStep({
         {service!=="flight" && <dl className="review-contact"><div><dt>Flight fee per traveller</dt><dd>{formatPrice(quote.flightUnitMinor)}</dd></div><div><dt>Hotel fee per traveller · {draft.hotels?.length} stay(s)</dt><dd>{formatPrice(quote.hotelUnitMinor)}</dd></div>{service==="combo" && <div><dt>Combo saving per traveller</dt><dd>−{formatPrice(quote.discountUnitMinor)}</dd></div>}</dl>}
         <p className="field-hint">
           For the temporary reservation document only. This fee does not buy a
-          paid airline ticket or hotel accommodation. No payment is taken in this preview.
+          paid airline ticket or hotel accommodation. Saving your request does not charge you.
         </p>
       </section>
-      <DeliveryInformation />
+      <DeliveryInformation settings={runtime?.preferences} />
       <details className="draft-terms" id="draft-service-terms">
-        <summary>Read the draft service terms</summary>
+        <summary>Read the provisional service terms</summary>
         <div>
           <p>
             <strong>
-              Draft policy wording — for this development preview only.
+              Provisional service terms.
             </strong>{" "}
-            Policy version: {bookingPolicy.version}. {bookingPolicy.text}
+            {bookingPolicy.text}
           </p>
           <ul>
             <li>
@@ -205,7 +208,7 @@ export function ReviewStep({
             <li>
               Changes, cancellations and refunds will be governed by the final
               published policies. Saved orders await payment and no fee is
-              charged in this phase.
+              charged when you save your request.
             </li>
           </ul>
         </div>
@@ -216,7 +219,7 @@ export function ReviewStep({
       />
       <BookingCheckbox
         name="confirmations.termsAccepted"
-        label="I have read and accept the draft service terms for this preview."
+        label="I have read and accept the provisional service terms."
       />
     </>
   );

@@ -51,6 +51,7 @@ import { HotelSummary } from "./hotel-summary";
 import { PassengerStep } from "./passenger-step";
 import { CommunicationStep } from "./communication-step";
 import { ReviewStep } from "./review-step";
+import { pricingCatalog, type PublicRuntime } from "@/lib/site-runtime";
 
 const steps = ["Trip details", "Passenger details", "Communication", "Review"];
 const descriptions = [
@@ -60,10 +61,10 @@ const descriptions = [
   "A final look before the next step.",
 ];
 
-export function BookingForm() {
+export function BookingForm({ runtime }: { runtime?: PublicRuntime } = {}) {
   const params = useSearchParams();
   const savedId = params.get("draft");
-  if (savedId) return <ResumeBooking key={savedId} id={savedId} />;
+  if (savedId) return <ResumeBooking key={savedId} id={savedId} runtime={runtime} />;
   const initialDraft = createBookingDraft(params);
   // A new homepage trip selection must start a new draft, even when Next.js
   // reuses this route's client tree. Only allowlisted trip fields form the key.
@@ -71,11 +72,12 @@ export function BookingForm() {
     <BookingWizard
       key={JSON.stringify([initialDraft.service,initialDraft.trip])}
       initialDraft={initialDraft}
+      runtime={runtime}
     />
   );
 }
 
-function ResumeBooking({ id }: { id: string }) {
+function ResumeBooking({ id, runtime }: { id: string; runtime?: PublicRuntime }) {
   const { session, error, setCustomer } = useCustomer();
   const [saved, setSaved] = useState<SavedDraft | null>(null);
   const [loadError, setLoadError] = useState("");
@@ -112,6 +114,7 @@ function ResumeBooking({ id }: { id: string }) {
         initialDraft={saved.data}
         savedDraft={saved}
         savedOwnerId={loadedFor}
+        runtime={runtime}
       />
     );
   if (!uuidPattern.test(id))
@@ -147,11 +150,14 @@ function BookingWizard({
   initialDraft,
   savedDraft,
   savedOwnerId,
+  runtime,
 }: {
   initialDraft: BookingDraft;
   savedDraft?: SavedDraft;
   savedOwnerId?: string;
+  runtime?: PublicRuntime;
 }) {
+  const catalog = runtime ? pricingCatalog(runtime.pricing) : business;
   const [step, setStep] = useState(savedDraft ? 3 : 0);
   const [errorCount, setErrorCount] = useState(0);
   const [showAccount, setShowAccount] = useState(false);
@@ -178,12 +184,21 @@ function BookingWizard({
   const heading = useRef<HTMLHeadingElement>(null);
   const today = useBusinessDate();
   const service=draft.service ?? "flight";
-  const bookingPolicy=policyForService(service);
-  const quote = getReservationQuote(draft.trip.type, draft.passengers.length,service,Math.max(1,draft.hotels?.length ?? 0));
+  const bookingPolicy=policyForService(service, runtime?.policies);
+  const quote = getReservationQuote(draft.trip.type, draft.passengers.length,service,Math.max(1,draft.hotels?.length ?? 0), catalog);
+  const acceptance = JSON.stringify([bookingPolicy.version, bookingPolicy.text, quote.pricePerPassengerMinor]);
+  const reviewedAcceptance = useRef(acceptance);
+  useEffect(() => {
+    if (reviewedAcceptance.current === acceptance) return;
+    methods.setValue("confirmations.detailsCorrect", false);
+    methods.setValue("confirmations.termsAccepted", false);
+    reviewedAcceptance.current = acceptance;
+  }, [acceptance, methods]);
   const matchesSaved =
     !!saved && bookingFingerprint(saved.data) === bookingFingerprint(draft);
 
   async function saveBooking(customer: Customer) {
+    if (reviewedAcceptance.current !== acceptance) return;
     if (ownerId.current && ownerId.current !== customer.id) {
       setSaveError(
         "This saved draft belongs to the original account. Sign in to that account to update it. Your current edits are still here.",
@@ -233,6 +248,10 @@ function BookingWizard({
   }
   async function createOrder() {
     if (!saved || !matchesSaved || saving.current) return;
+    if (reviewedAcceptance.current !== acceptance || !methods.getValues("confirmations.detailsCorrect") || !methods.getValues("confirmations.termsAccepted")) {
+      setSaveError("Review the current fee and service terms, confirm both checkboxes and save again before creating your order.");
+      return;
+    }
     saving.current = true;
     setBusy(true);
     setSaveError("");
@@ -338,7 +357,7 @@ function BookingWizard({
         <p>
           {saved
             ? "Your saved draft is available in My orders. Unsaved edits are lost on refresh. Save again after editing."
-            : "Before sign-in and saving, your details stay in memory. Refreshing clears personal details. Verify your email at review to save securely."}{" "}
+            : "Your details aren’t saved yet. Verify your email at review to save them. Refreshing or leaving this page will clear unsaved details."}{" "}
           <Link href="/account/orders" target="_blank" rel="noopener">
             My orders (new tab)
           </Link>
@@ -370,7 +389,7 @@ function BookingWizard({
           <fieldset disabled={busy} className="booking-controls">
             <div className="booking-panel-heading">
               <p className="eyebrow">
-                STEP {step + 1} OF {steps.length}
+                Step {step + 1} of {steps.length}
               </p>
               <h2 id="booking-step-heading" ref={heading} tabIndex={-1}>
                 {steps[step]}
@@ -384,14 +403,14 @@ function BookingWizard({
             )}
             {step === 0 && <ServiceStep today={today} />}
             {step === 1 && <PassengerStep today={today} />}
-            {step === 2 && <CommunicationStep today={today} />}
+            {step === 2 && <CommunicationStep today={today} settings={runtime?.preferences} />}
             {step === 3 && savedDraft && (
               <p className="booking-help">
                 Your saved details are restored. Please review the current
                 service fee and terms, then confirm both checkboxes again.
               </p>
             )}
-            {step === 3 && <ReviewStep draft={draft} onEdit={editStep} />}
+            {step === 3 && <ReviewStep draft={draft} onEdit={editStep} runtime={runtime} />}
             {step === 3 && showAccount && (
               <div
                 ref={accountHeading}
@@ -519,7 +538,7 @@ function BookingWizard({
                 </button>
               ) : (
                 <span className="booking-start-note">
-                  No payment in this preview
+                  No charge when saving your request
                 </span>
               )}
               <button

@@ -1,0 +1,20 @@
+.location-autocomplete { position: relative; min-width: 0; width: 100%; }
+.location-input-wrap { position: relative; min-width: 0; }
+.location-autocomplete .location-input-wrap > input { padding-right: 42px; }
+.location-clear { position: absolute; inset-block: 1px; right: 1px; width: 40px; display: flex; align-items: center; justify-content: center; background: transparent; color: #52646b; border-radius: 4px; }
+.location-clear:hover { color: #06655f; background: #edf5f2; }
+.location-popover { position: absolute; top: calc(100% + 8px); left: 0; right: 0; z-index: 35; display: flex; flex-direction: column; min-width: 0; border: 1px solid #a5bfb2; border-radius: 12px; background: #fff; box-shadow: 0 14px 34px #142b3e26; color: #142b3e; overflow: hidden; pointer-events: none; }
+.location-popover-above { top: auto; bottom: calc(100% + 8px); }
+.location-popover > ul { padding: 5px; margin: 0; list-style: none; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; min-height: 0; pointer-events: auto; }
+.location-popover .location-option { display: flex; align-items: flex-start; gap: 10px; padding: 12px 10px; margin: 0; border: 2px solid transparent; border-radius: 7px; min-width: 0; min-height: 64px; cursor: pointer; line-height: 1.5; }
+.location-option > svg { color: #087f79; margin-top: 3px; }
+.location-option-copy { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.location-option-copy strong { display: block; font-size: var(--text-sm); font-weight: 600; }
+.location-option-copy > span { display: block; color: #52646b; font-size: var(--text-caption); margin-top: 3px; line-height: 1.6; }
+.location-popover .location-option:hover, .location-popover .location-option-active { border-color: #087f79; background: #edf5f2; }
+.location-code { font-size: var(--text-caption); font-weight: 600; color: #06655f; background: #edf5f2; border: 1px solid #cadfd6; padding: 3px 6px; border-radius: 5px; flex-shrink: 0; }
+.location-popup-note { margin: 0; padding: 10px 14px; border-top: 1px solid #dfe7e5; color: #52646b; font-size: var(--text-caption); line-height: 1.65; flex-shrink: 0; }
+.location-popover-compact .location-popup-note { display: none; }
+.location-search-message { margin: 0; padding: 16px; font-size: var(--text-sm); line-height: 1.7; overflow-wrap: anywhere; }
+@media (max-width: 480px) { .location-popover .location-option { padding: 10px 7px; gap: 8px; } }
+@media (forced-colors: active) { .location-popover .location-option-active { border-color: Highlight; } .location-option > svg { color: currentColor; } }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useForm, useWatch } from "react-hook-form";
+import { useController, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ArrowRight,
@@ -13,6 +13,7 @@ import {
 import { business, formatPrice, tripTypes } from "@/config/business";
 import { tripToBookingUrl, tripSchema, type TripValues } from "@/lib/trip";
 import { useBusinessDate } from "@/lib/use-business-date";
+import { LocationAutocomplete } from "./location-autocomplete";
 
 export function TripStarter() {
   const router = useRouter();
@@ -34,6 +35,10 @@ export function TripStarter() {
       returnDate: "",
     },
   });
+  // Register route fields before date inputs, preserving RHF's logical
+  // first-invalid-field focus order with the controlled comboboxes.
+  const { field: fromField } = useController({ control, name: "from" });
+  const { field: toField } = useController({ control, name: "to" });
   const type = useWatch({ control, name: "type" });
   const departure = useWatch({ control, name: "departure" });
   const today = useBusinessDate();
@@ -77,15 +82,7 @@ export function TripStarter() {
             <label htmlFor="from">
               <MapPin size={15} /> From
             </label>
-            <input
-              id="from"
-              placeholder="City or airport"
-              autoComplete="off"
-              maxLength={100}
-              {...register("from")}
-              aria-invalid={!!errors.from}
-              aria-describedby={errors.from ? "from-error" : undefined}
-            />
+            <LocationAutocomplete id="from" label="From" kind="airport" name={fromField.name} inputRef={fromField.ref} value={fromField.value} onChange={fromField.onChange} onBlur={fromField.onBlur} placeholder="City or airport code" maxLength={100} aria-invalid={!!errors.from} aria-describedby={errors.from ? "from-error" : undefined} />
             {errors.from && (
               <p className="field-error" id="from-error">
                 {errors.from.message}
@@ -108,15 +105,7 @@ export function TripStarter() {
             <label htmlFor="to">
               <MapPin size={15} /> To
             </label>
-            <input
-              id="to"
-              placeholder="City or airport"
-              autoComplete="off"
-              maxLength={100}
-              {...register("to")}
-              aria-invalid={!!errors.to}
-              aria-describedby={errors.to ? "to-error" : undefined}
-            />
+            <LocationAutocomplete id="to" label="To" kind="airport" name={toField.name} inputRef={toField.ref} value={toField.value} onChange={toField.onChange} onBlur={toField.onBlur} placeholder="City or airport code" maxLength={100} aria-invalid={!!errors.to} aria-describedby={errors.to ? "to-error" : undefined} />
             {errors.to && (
               <p className="field-error" id="to-error">
                 {errors.to.message}
@@ -170,7 +159,7 @@ export function TripStarter() {
             disabled={!today}
             className="button button-primary trip-submit"
           >
-            Book Dummy Ticket <ArrowRight size={18} />
+            Book dummy ticket <ArrowRight size={18} />
           </button>
         </div>
         {type === "multi-city" && (
@@ -180,8 +169,8 @@ export function TripStarter() {
           </p>
         )}
         <p className="starter-disclaimer">
-          Continue to your temporary booking draft. Sign-in and payment are not
-          yet available.
+          Review your trip and verify your email to save your request. Online
+          payments are currently unavailable; preparation starts only after verified payment.
         </p>
         <noscript>
           <p className="starter-disclaimer">

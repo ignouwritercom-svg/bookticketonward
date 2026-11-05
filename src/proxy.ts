@@ -2,9 +2,16 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { supabaseConfig } from "@/lib/supabase/config";
 import { publicCollectionStatus } from "@/lib/public-routing";
+import { managedRouteStatus } from "@/lib/managed-route";
 
 export async function proxy(request: NextRequest) {
-  const publicStatus = publicCollectionStatus(request.nextUrl.pathname);
+  let publicStatus = publicCollectionStatus(request.nextUrl.pathname);
+  if (publicStatus) {
+    const managed = await managedRouteStatus(request.nextUrl.pathname);
+    if (managed === "unavailable") return new NextResponse("This page is temporarily unavailable. Please try again later.", { status: 503, headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store", "X-Robots-Tag": "noindex, nofollow", "Retry-After": "60" } });
+    if (managed === "published") publicStatus = "known";
+    if (managed === "withdrawn") publicStatus = "missing";
+  }
   if (publicStatus === "known") return NextResponse.next();
   if (publicStatus === "missing") {
     // Resolve unknown collection URLs to the unmatched-route 404 before a

@@ -1,3 +1,4 @@
+import { AdminHeader } from "@/components/admin/workspace";
 import { Suspense } from "react";
 import Link from "next/link";
 import { staffPage } from "@/lib/admin";
@@ -15,8 +16,8 @@ async function Log({ searchParams }: { searchParams: Promise<{ page?: string; fa
   const fresh = await client.rpc("is_booking_staff");
   if (fresh.error || fresh.data !== true) return <AdminDenied />;
   const jobs = (result.data?.jobs ?? []) as NotificationJob[];
-  return <><h1>Notification operations</h1><p>Email status is separate from payment, document publication and manual delivery. “Sent” means SMTP accepted the email, not that it was received or read.</p>
-    <nav className="account-actions" aria-label="Notification filters"><Link href="/admin/notifications" prefetch={false}>All notifications</Link><Link href="/admin/notifications?failed=true" prefetch={false}>Failed notifications</Link><Link href="/admin/orders?payment=paid&fulfilment=not_started" prefetch={false}>Paid orders awaiting action</Link></nav>
+  return <><AdminHeader title="Notification Operations" intro="Review transactional email attempts, failures and guarded retries." /><p>Email status is separate from payment, document publication and manual delivery. “Sent” means SMTP accepted the email, not that it was received or read.</p>
+    <nav className="ops-tabs" aria-label="Notification filters"><Link href="/admin/notifications" prefetch={false}>All notifications</Link><Link href="/admin/notifications?failed=true" prefetch={false}>Failed notifications</Link><Link href="/admin/orders?payment=paid&fulfilment=not_started" prefetch={false}>Paid orders awaiting action</Link></nav>
     {result.error ? <p role="alert">Notification log unavailable. Check notification setup and retry.</p> : <><p>{result.data.failed_count} failed notification(s) need review.</p>
       {!jobs.length && <div className="account-empty">No notifications in this view.</div>}
       {jobs.slice(0,20).map(job => <NotificationJobCard key={job.id} job={job} />)}

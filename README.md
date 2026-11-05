@@ -1,5 +1,9 @@
 # DummyTicket — public content, booking and staff document workflow
 
+The 5 November admin expansion adds order queues, a private document library, customer search/history, structured website editing, approved contacts, runtime prices/policies and revision history for the existing admin. Start with [ADMIN_WORKSPACE.md](docs/ADMIN_WORKSPACE.md): the fifth migration and server flag are manual prerequisites. Routine approved content updates then use draft, preview and publish without a code change or rebuild. Customer workspace details are in [CUSTOMER_WORKSPACE.md](docs/CUSTOMER_WORKSPACE.md).
+
+The 4 November customer-facing review removes obsolete development notices and replaces setup errors with actionable customer messages. Owner tasks, pending business approvals and the deployed account-configuration check are documented in [LAUNCH_READINESS.md](docs/LAUNCH_READINESS.md) and the protected staff overview. Policy pages remain provisional; payment processing remains on hold.
+
 Phase 6 adds all public service/help/policy routes, two sourced destination pages, three guides and technical SEO. [SEO_ARCHITECTURE.md](docs/SEO_ARCHITECTURE.md) explains the approved canonical domain, explicit launch indexing switch, draft-policy restrictions, content model and verification. Preview remains noindex; payments remain on hold.
 
 Phase 5 is documented, not implemented: [payment architecture and gateway-selection requirements](docs/PHASE5_PAYMENTS_ARCHITECTURE.md). Existing payment restrictions remain active.
@@ -8,7 +12,7 @@ Hotel-only and Flight + Hotel are now implemented too. Open `/book?service=hotel
 
 A responsive dummy-ticket service with Next.js App Router, TypeScript, Tailwind, React Hook Form and Zod. Customer OTP, drafts and unpaid orders are preserved; Phase four adds protected staff order management, private PDF versions, explicit publication/manual-delivery records and owner-authorized downloads. No payment integration or deployment.
 
-Start with [ADMIN_SETUP.md](docs/ADMIN_SETUP.md) for the new additive migration, private bucket/server-only secret and controlled first-admin assignment. The existing customer migration must not be rerun. Open `/admin` after setup and sign in with the assigned staff account. Genuine unpaid orders remain blocked from fulfilment.
+[ADMIN_SETUP.md](docs/ADMIN_SETUP.md) documents the earlier document migration, private bucket/server-only secret and first-admin assignment. Do not rerun applied migrations or reassign staff to enable the expanded workspace. Open `/admin` with the existing staff account. Genuine unpaid orders remain blocked from fulfilment.
 
 ## Start the preview
 
@@ -29,6 +33,10 @@ npm run lint
 npm run typecheck
 npm run test:database
 npm run test:admin
+npm run test:management
+npm run test:notifications
+npm run test:admin:workspace
+npm run test:browser -- --seo-indexable
 npm run build
 npm start
 ```
@@ -45,19 +53,19 @@ npm start
 6. **Continue to sign in** opens inline email verification. After verification, the draft is saved; choose **Create order — awaiting payment** to create an unpaid order. Already signed-in customers save directly after reconciling their account email.
 7. Visit `/account/orders` to resume drafts or view orders. Open the saved-draft link to restore it after refresh. Unsaved changes remain in memory only. Missing Supabase configuration shows an unavailable state.
 
-Complete [Supabase development setup](docs/SUPABASE_SETUP.md): `.env.local`, the SQL migration, numeric OTP template and SMTP. The user has confirmed working development OTP and persistent orders. The agent has not applied the new admin/hotel migrations or performed hosted Storage checks; the setup guides contain the remaining steps.
+See [Supabase development setup](docs/SUPABASE_SETUP.md) for configuration and migration tracking. Earlier hosted document integration evidence is retained in the progress documentation. The admin workspace expansion uses isolated PostgreSQL/browser checks; it does not repeat hosted Storage checks or automatically apply its new migration.
 
 ## Edit the project
 
-- `src/config/business.ts`: placeholder brand, integer-paise prices, passenger/sector limits, currency, hours and delivery target.
+- `src/config/business.ts`: seed integer-paise prices, immutable service limits, currency and default hours/delivery target. After management setup, edit runtime fees, timing and acceptance text in the authorized admin settings, not by changing only a seed value.
 - `src/app/page.tsx`: server-rendered homepage content.
 - `src/app/globals.css`: design tokens and responsive styles, with Tailwind v4.
 - `src/components/booking/`: four-step form, shared field controls and review.
 - `src/app/book/booking.css`: booking layout that uses the existing design tokens.
-- `src/components/`: navigation, validated trip starter and development notices.
+- `src/components/`: shared navigation, public content, validated booking, account and staff UI.
 - `src/lib/trip.ts` / `src/lib/booking.ts`: shared validation and draft interfaces.
 - `docs/`: scope, route plan, visual system and progress.
 
-Implemented routes: `/`, `/book`, `/login`, `/account/orders`, `/account/orders/[orderId]`, `/admin`, `/admin/orders`, `/admin/orders/[orderId]`. Homepage samples remain illustrative. New orders remain Awaiting payment / Not started; private fulfilment requires a verified paid status. Payment integration and deployment remain later phases. No booking data is stored in browser storage. Explicit staff contact links contain only the selected contact and an order-reference message.
+The full public/customer/admin route inventory is in [PAGES.md](docs/PAGES.md). Homepage samples remain illustrative. New orders remain Awaiting payment / Not started; private fulfilment requires a verified paid status. Payment integration remains on hold and this work does not deploy. No booking data is stored in browser storage. Explicit staff contact links contain only the selected contact and an order-reference message.
 
 Locked dependencies include `@supabase/supabase-js` and `@supabase/ssr`. `test:database` uses isolated PGlite PostgreSQL with synthetic Auth; browser tests labelled MOCKED intercept service responses. Neither verifies live email delivery or a configured Supabase project. See docs/PROGRESS.md for checks actually completed and remaining verification.

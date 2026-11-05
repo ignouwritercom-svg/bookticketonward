@@ -59,10 +59,17 @@ export function OtpSignIn({
   const [remaining, setRemaining] = useState(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [focusRequest, setFocusRequest] = useState<{ target: "email" | "code" } | null>(null);
   const codeInput = useRef<HTMLInputElement>(null);
   const emailInput = useRef<HTMLInputElement>(null);
   const deadline = useRef(0);
   const inFlight = useRef(false);
+  // Run after React commits the code field or re-enables the email field.
+  // A requestAnimationFrame can run before that commit and lose keyboard focus.
+  useEffect(() => {
+    if (focusRequest)
+      (focusRequest.target === "code" ? codeInput : emailInput).current?.focus();
+  }, [focusRequest]);
   useEffect(() => {
     const timer = setInterval(
       () =>
@@ -85,7 +92,7 @@ export function OtpSignIn({
       setToken("");
       deadline.current = Date.now() + 60000;
       setRemaining(60);
-      requestAnimationFrame(() => codeInput.current?.focus());
+      setFocusRequest({ target: "code" });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Unable to send a code.");
       deadline.current = Date.now() + 60000;
@@ -128,8 +135,8 @@ export function OtpSignIn({
     >
       <h3>Verify your email</h3>
       <p>
-        Use the code sent by Supabase to securely sign in or create your
-        customer account.
+        We’ll email you a verification code to securely sign in or create your
+        account. No password needed.
       </p>
       <label htmlFor="auth-email">Account email</label>
       <input
@@ -197,7 +204,7 @@ export function OtpSignIn({
               setSent(false);
               setToken("");
               setError("");
-              requestAnimationFrame(() => emailInput.current?.focus());
+              setFocusRequest({ target: "email" });
             }}
           >
             Change email
@@ -218,8 +225,8 @@ export function AccountUnavailable() {
     <div className="account-empty" role="status">
       <h2>Account services are unavailable</h2>
       <p>
-        Supabase setup is required before sign-in, saved drafts and orders can
-        be used. No account or order has been created.
+        Sign-in and saving are currently unavailable. Please try again later.
+        This action has not created an account or saved a booking.
       </p>
       <p>
         You can still prepare your booking. Before saving, refreshing will clear

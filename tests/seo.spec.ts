@@ -1,4 +1,5 @@
 import { artifact } from "./artifacts";
+import { smallVisibleText } from "./typography";
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { publicEntries } from "../src/content/registry";
@@ -51,6 +52,10 @@ test("all public pages: metadata, headings, schema, internal links and reachabil
   page.on("pageerror", error => errors.push(error.message));
   for (const entry of publicEntries) {
     expect((await page.goto(entry.path))?.status(), entry.path).toBe(200);
+    const visibleCopy = await page.locator("body").innerText();
+    expect(visibleCopy, entry.path).not.toMatch(/development preview|in this preview|next phase|business approval|launch blockers|configured working hours|come later|decisions required before approval/i);
+    if (["/terms", "/privacy", "/refunds"].includes(entry.path)) await expect(page.locator(".content-notice")).toContainText("Provisional policy notice");
+    await expect(page.getByRole("heading", { name: "Website readiness" })).toHaveCount(0);
     const title = await page.title();
     expect(title, entry.path).toBeTruthy(); expect(titles.has(title), `duplicate title ${entry.path}`).toBe(false); titles.add(title);
     const description = await page.locator('meta[name="description"]').getAttribute("content");
@@ -80,7 +85,7 @@ test("all public pages: metadata, headings, schema, internal links and reachabil
       const schemas = await page.locator('script[type="application/ld+json"]').allTextContents();
       const parsed = schemas.map(value => JSON.parse(value));
       expect(parsed.find(item => item["@type"] === "BreadcrumbList").itemListElement.at(-1).item).toBe(new URL(entry.path, approvedOrigin).href);
-      const contentSchema = parsed.find(item => ["Article", "WebPage"].includes(item["@type"]));
+      const contentSchema = parsed.find(item => ["Article", "WebPage", "AboutPage", "ContactPage"].includes(item["@type"]));
       expect(heading).toContain(contentSchema.headline ?? contentSchema.name);
       expect(contentSchema.description).toBe(description);
       expect(schemas.join(" ")).not.toMatch(/aggregateRating|reviewRating|FAQPage/);
@@ -145,6 +150,7 @@ test("public mobile layouts and WCAG automated checks", async ({ page }, testInf
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `${entry.path} overflows ${width}`).toBe(true);
     }
     await page.setViewportSize({ width: 390, height: 844 });
+    expect(await smallVisibleText(page), `small text on ${entry.path}`).toEqual([]);
     const result = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
     expect(result.violations, entry.path).toEqual([]);
   }
@@ -165,5 +171,5 @@ test("public content works without JavaScript and keyboard navigation remains us
   await page.setViewportSize({ width: 390, height: 844 }); await page.goto("/pricing");
   await page.keyboard.press("Tab"); await expect(page.getByRole("link", { name: "Skip to content" })).toBeFocused(); await page.keyboard.press("Enter"); await expect(page).toHaveURL(/#main-content$/);
   await page.getByRole("button", { name: "Open navigation" }).click(); await page.keyboard.press("Escape"); await expect(page.getByRole("button", { name: "Open navigation" })).toBeFocused();
-  await page.getByRole("link", { name: "Refunds (draft)", exact: true }).click(); await expect(page.locator(".content-notice")).toContainText("business approval required");
+  await page.locator(".public-footer").getByRole("link", { name: "Changes and refunds", exact: true }).click(); await expect(page.locator(".content-notice")).toContainText("Provisional policy notice");
 });

@@ -6,7 +6,7 @@ const args = process.argv.slice(2);
 const indexable = args.includes("--seo-indexable");
 const runDirectory = `test-results/browser-run-${randomUUID()}`;
 console.log(`Retained browser evidence: ${runDirectory}`);
-const env = { ...process.env,
+const env = { ...process.env, SITE_MANAGEMENT_ENABLED: "false",
   TEST_RUN_DIR: runDirectory,
   PLAYWRIGHT_OUTPUT_DIR: `${runDirectory}/playwright`,
   SITE_URL: "https://dummyticketonward.com",

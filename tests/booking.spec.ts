@@ -39,7 +39,7 @@ test("homepage booking links reach /book and pricing links preselect trip type",
   await page.getByRole("link", { name: "Back to homepage" }).click();
   await page
     .locator(".header-actions")
-    .getByRole("link", { name: "Book Dummy Ticket" })
+    .getByRole("link", { name: "Book dummy ticket" })
     .click();
   await expect(page).toHaveURL(/\/book$/);
   await expect(page.getByLabel("Return date", { exact: true })).toHaveCount(0);
@@ -149,10 +149,13 @@ test("unconfigured booking preserves values, validates contact and never creates
   page,
 }) => {
   const requests: string[] = [];
+  const locationQueries: Record<string, unknown>[] = [];
   const logs: string[] = [];
   await startTrip(page);
   page.on("request", (request) => {
-    if (request.method() !== "GET") requests.push(request.url());
+    if (request.method() === "GET") return;
+    if (new URL(request.url()).pathname === "/api/locations") locationQueries.push(request.postDataJSON());
+    else requests.push(request.url());
   });
   page.on("console", (message) => logs.push(message.text()));
   await fillPassenger(page);
@@ -266,7 +269,7 @@ test("unconfigured booking preserves values, validates contact and never creates
     .check();
   await page
     .getByLabel(
-      "I have read and accept the draft service terms for this preview.",
+      "I have read and accept the provisional service terms.",
     )
     .check();
   await page.getByRole("button", { name: "Continue to sign in" }).click();
@@ -274,7 +277,7 @@ test("unconfigured booking preserves values, validates contact and never creates
     page.getByRole("heading", { name: "Account services are unavailable" }),
   ).toBeVisible();
   await expect(
-    page.getByText(/No account or order has been created/),
+    page.getByText(/This action has not created an account or saved a booking/),
   ).toBeVisible();
   expect(page.url()).not.toMatch(/traveller|Aarav|Neill|98765/);
   expect(
@@ -284,6 +287,8 @@ test("unconfigured booking preserves values, validates contact and never creates
     })),
   ).toEqual({ local: [], session: [] });
   expect(requests).toEqual([]);
+  for (const query of locationQueries) expect(Object.keys(query).sort()).toEqual(["kind", "query"]);
+  expect(JSON.stringify(locationQueries)).not.toMatch(/traveller@example|98765|givenNames|passengers|communication/);
   expect(logs.some((log) => /traveller@example|Élodie|98765/.test(log))).toBe(
     false,
   );

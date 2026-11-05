@@ -12,7 +12,7 @@ test("server-rendered content, working anchors, no browser errors and desktop ac
   expect(response?.status()).toBe(200);
   await expect(page).toHaveTitle(/DummyTicket/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "Dummy Flight Ticket & Dummy Hotel Booking.",
+    "Dummy Flight Ticket & Dummy Hotel Booking",
   );
   const brokenAnchors = await page
     .locator('a[href^="#"]')
@@ -49,7 +49,7 @@ test("homepage validation and selected return/multi-city trips reach booking", a
 }) => {
   await page.goto("/");
   const form = page.locator("#trip-starter form");
-  const submit = form.getByRole("button", { name: "Book Dummy Ticket" });
+  const submit = form.getByRole("button", { name: "Book dummy ticket" });
   await submit.click();
   await expect(
     page.getByText("Enter a departure city or airport."),
@@ -78,7 +78,9 @@ test("homepage validation and selected return/multi-city trips reach booking", a
   await page.getByLabel("Return date", { exact: true }).fill("2099-06-15");
   const outgoing: string[] = [];
   page.on("request", (request) => {
-    if (request.method() !== "GET") outgoing.push(request.method());
+    // Public location lookups are allowed; submitting a trip must not save or
+    // send the booking to any other endpoint.
+    if (request.method() !== "GET" && new URL(request.url()).pathname !== "/api/locations") outgoing.push(request.method());
   });
   await submit.click();
   await expect(page).toHaveURL(
@@ -183,34 +185,22 @@ test("mobile navigation, FAQ keyboard interaction, reduced motion and overflow",
   ).toEqual([]);
 });
 
-test("homepage contact notice retains accessible modal controls", async ({
+test("homepage help opens the real help page instead of a development notice", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
-  for (const [name, title] of [
-    ["Contact information", "Contact details are being finalised"],
-  ]) {
-    const trigger = page.getByRole("button", { name, exact: true });
-    await trigger.click();
-    await expect(page.getByRole("dialog")).toBeVisible();
-    await expect(page.getByRole("heading", { name: title })).toBeVisible();
-    expect(
-      (
-        await new AxeBuilder({ page })
-          .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
-          .analyze()
-      ).violations,
-    ).toEqual([]);
-    await page.keyboard.press("Tab");
-    expect(
-      await page.evaluate(() => !!document.activeElement?.closest("dialog")),
-    ).toBe(true);
-    await page
-      .getByRole("button", { name: "Close development notice" })
-      .click();
-    await expect(trigger).toBeFocused();
-  }
+  await page.getByRole("link", { name: "Booking help", exact: true }).click();
+  await expect(page).toHaveURL(/\/contact$/);
+  await expect(page.getByRole("heading", { name: "Trouble signing in?" })).toBeVisible();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page.locator(".content-notice")).toHaveCount(0);
+  // Cache Components can retain the previous page with display:none after navigation.
+  await expect(page.getByRole("main")).toHaveCount(1);
+  await expect(page.getByRole("main")).toContainText("Direct email and telephone support are currently unavailable");
+  expect((await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations).toEqual([]);
+  await page.getByRole("link", { name: "Read frequently asked questions", exact: true }).click();
+  await expect(page).toHaveURL(/\/faq$/);
 });
 
 test("content and FAQs remain useful without JavaScript; configured indexing policy is enforced", async ({

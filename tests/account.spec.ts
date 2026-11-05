@@ -32,7 +32,7 @@ async function reviewBooking(page: Page, email = customer.email) {
     .check();
   await page
     .getByLabel(
-      "I have read and accept the draft service terms for this preview.",
+      "I have read and accept the provisional service terms.",
     )
     .check();
 }
@@ -76,6 +76,13 @@ test("unconfigured real endpoints fail closed, prevent cross-origin writes and d
     headers: { Origin: "http://127.0.0.1:3100" },
   });
   expect(save.status()).toBe(503);
+  expect((await save.json()).error).not.toMatch(/supabase|setup|migration|database/i);
+  const send = await request.post("/api/auth/send", {
+    data: { email: customer.email },
+    headers: { Origin: "http://127.0.0.1:3100" },
+  });
+  expect(send.status()).toBe(503);
+  expect((await send.json()).error).not.toMatch(/supabase|setup|migration|database/i);
   for (const path of [
     "/login",
     "/account/orders",
@@ -86,6 +93,7 @@ test("unconfigured real endpoints fail closed, prevent cross-origin writes and d
     await expect(
       page.getByRole("heading", { name: "Account services are unavailable" }),
     ).toBeVisible();
+    await expect(page.locator("main")).not.toContainText(/Supabase|migration|setup required/i);
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
       "content",
       "noindex, nofollow",
@@ -145,6 +153,7 @@ test("MOCKED OTP: provider-length code, errors, resend countdown, safe redirect 
   ).toEqual([]);
   await page.getByRole("button", { name: "Change email", exact: true }).click();
   await expect(page.getByLabel("Account email", { exact: true })).toBeEnabled();
+  await expect(page.getByLabel("Account email", { exact: true })).toBeFocused();
   // A page reload resets only the UI timer; provider-side rate limiting remains authoritative.
   await page.reload();
   await page.getByLabel("Account email", { exact: true }).fill(customer.email);
@@ -227,7 +236,7 @@ test("MOCKED booking: inline OTP preserves details, saves and resumes after refr
   await expect(page.getByText("1. Test Traveller Example")).toBeVisible();
   await expect(
     page.getByLabel(
-      "I have read and accept the draft service terms for this preview.",
+      "I have read and accept the provisional service terms.",
     ),
   ).not.toBeChecked();
   await page
@@ -237,7 +246,7 @@ test("MOCKED booking: inline OTP preserves details, saves and resumes after refr
     .check();
   await page
     .getByLabel(
-      "I have read and accept the draft service terms for this preview.",
+      "I have read and accept the provisional service terms.",
     )
     .check();
   for (let i = 0; i < 2; i++) {

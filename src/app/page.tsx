@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { SampleDocument } from "@/components/sample-document";
+import { PlanningLibrary, ReservationExplainer } from "@/components/public/home-planning";
 import { publicMetadata } from "@/lib/seo";
 
-export const metadata = publicMetadata("/", "Dummy Flight Ticket & Dummy Hotel Booking", "Book a dummy flight ticket, dummy hotel booking or flight + hotel combo. Compare service fees and review temporary reservation documents before preparing a request.");
+export async function generateMetadata() { const { preferences } = await publicSite(); return publicMetadata("/", preferences.homeMetaTitle, preferences.homeMetaDescription); }
 import {
   ArrowDown,
   ArrowRight,
@@ -28,18 +29,14 @@ import {
   UserRound,
 } from "lucide-react";
 import {
-  business,
-  deliveryTarget,
+  business as defaultBusiness,
   formatPrice,
-  getReservationQuote,
+  getReservationQuote as baseQuote,
   serviceLabels,
   tripTypes,
-  workingHours,
 } from "@/config/business";
-import {
-  DevelopmentAction,
-  DevelopmentNoticeProvider,
-} from "@/components/development-notice";
+import { publicSite, publishedEntries } from "@/lib/site-content";
+import { pricingCatalog, preferenceDelivery, preferenceHours } from "@/lib/site-runtime";
 import { TripStarter } from "@/components/trip-starter";
 
 const steps = [
@@ -51,12 +48,12 @@ const steps = [
   {
     icon: CreditCard,
     title: "Sign in & review",
-    text: "Verify your login email with an OTP and save your reviewed order. Payments are not enabled yet.",
+    text: "Verify your email with a sign-in code, check every detail and save your request securely.",
   },
   {
     icon: UserRound,
     title: "Follow your order",
-    text: "See payment and fulfilment updates in your account while our team prepares your document.",
+    text: "View your order status in your account. Document preparation begins only after verified payment and complete details.",
   },
   {
     icon: Mail,
@@ -64,7 +61,7 @@ const steps = [
     text: "Our team uploads your dummy flight ticket or dummy hotel booking documents to your order and sends them through your preferred channel.",
   },
 ];
-const faqs = [
+function homepageFaqs(deliveryTarget: string, workingHours: string) { return [
   {question:"Can I get a dummy hotel booking and dummy flight ticket together?",answer:"Yes. Choose Dummy Hotel Booking when you already have flights, or Dummy Flight + Hotel Combo to request both in one order. Enter traveller details once and add the hotel city, country, check-in/check-out dates and rooms. Hotel fees are per traveller per stay, not room rent. Our team must arrange a reservation before publishing its document; availability and visa acceptance are not guaranteed."},
   {
     question: "What is a dummy ticket?",
@@ -79,27 +76,34 @@ const faqs = [
   {
     question: "How will I receive my dummy flight ticket or dummy hotel booking?",
     answer:
-      "Once ordering launches, our team will manually prepare the document, upload it to your order and send it through your selected channel: WhatsApp or email. A login email will be required independently of your delivery preference.",
+      "After verified payment and preparation, your published documents are available in your account. You can also choose WhatsApp or email delivery. A verified account email is required for either option.",
   },
   {
     question: "How long does delivery take?",
-    answer: `Our development delivery target is ${deliveryTarget} after verified payment and receipt of complete details. Working hours are ${workingHours}. Requests outside these hours will be handled during the next working period. This is a target, not a guaranteed deadline.`,
+    answer: `Our delivery target is ${deliveryTarget} after verified payment and receipt of complete details. Working hours are ${workingHours}. Requests outside these hours will be handled during the next working period. This is a target, not a guaranteed deadline.`,
   },
   {
     question: "Can I request changes to my details?",
     answer:
-      "Please review all passenger and trip details before paying. Contact our team if a change is needed. Whether a change is possible, and any fee, will depend on the order stage and the policy published before launch. Changes are not guaranteed.",
+      "You can edit a saved draft before creating an order. An existing order keeps the details you confirmed when creating it. Review the changes and refunds information before requesting a correction; changes to an existing order are not automatic.",
   },
   {
     question: "Where can I check my order?",
     answer:
-      "Sign in with your email OTP to resume saved drafts and view orders and published reservation documents. New orders currently await payment; payments are not enabled yet. Staff fulfilment requires verified payment. The account illustration is an example.",
+      "Sign in with your email code to resume saved drafts, view order status and download available reservation documents. Online payments are currently unavailable; new orders remain awaiting payment and document preparation does not begin.",
   },
-];
+]; }
 
-export default function Home() {
+export default async function Home() {
+  const snapshot = await publicSite();
+  const business = { ...defaultBusiness, ...pricingCatalog(snapshot.pricing) };
+  const deliveryTarget = preferenceDelivery(snapshot.preferences), workingHours = preferenceHours(snapshot.preferences);
+  const getReservationQuote: typeof baseQuote = (type, count, service, stays) => baseQuote(type, count, service, stays, business);
+  const managedFaq = snapshot.records.find(record => record.key === "page:faq" && record.active)?.payload;
+  const faqs = managedFaq && "faqs" in managedFaq && managedFaq.faqs?.length ? managedFaq.faqs : homepageFaqs(deliveryTarget, workingHours);
+  const collections = publishedEntries(snapshot);
   return (
-    <DevelopmentNoticeProvider>
+    <>
       <div id="top" />
       <main id="main-content" tabIndex={-1}>
         <section className="hero-section" aria-labelledby="hero-heading">
@@ -107,16 +111,14 @@ export default function Home() {
             <div className="hero-grid">
               <div className="hero-copy">
                 <p className="eyebrow">
-                  <span className="small-line" /> YOUR NEXT CHAPTER STARTS HERE
+                  <span className="small-line" /> Dummy reservations, clearly explained
                 </p>
                 <h1 id="hero-heading">
-                  Dummy Flight Ticket
-                  <br className="desktop-break" /> <span>& Dummy Hotel Booking.</span>
+                  {snapshot.preferences.heroTitle}
+                  <br className="desktop-break" /> <span>{snapshot.preferences.heroHighlight}</span>
                 </h1>
                 <p className="hero-description">
-                  Your travel plans, clearly documented. Enter your details,
-                  request a dummy flight ticket, dummy hotel booking or both in
-                  one order. Review your documents in your private account.
+                  {snapshot.preferences.heroIntro}
                 </p>
                 <div className="hero-actions">
                   <Link href="/book" className="button button-primary">
@@ -133,8 +135,8 @@ export default function Home() {
               </div>
               <div className="hero-visual">
                 <div className="visual-caption">
-                  <span className="caption-line" /> A LITTLE PAPERWORK. A BIG
-                  NEXT STEP.
+                  <span className="caption-line" /> A little paperwork. A big
+                  next step.
                 </div>
                 <div className="ticket-stage">
                   <div className="paper-back" />
@@ -155,9 +157,9 @@ export default function Home() {
               </div>
             </div>
             <div className="reservation-services" aria-label="Dummy ticket and hotel booking services">
-              <Link href="/book?service=flight"><Plane size={23} /><strong>{serviceLabels.flight}</strong><span>One-way, return or multi-city</span><b>From {formatPrice(business.prices["one-way"])} / traveller</b></Link>
-              <Link href="/book?service=hotel"><Hotel size={23} /><strong>{serviceLabels.hotel}</strong><span>Already have your flight? Plan your stay.</span><b>{formatPrice(business.hotelPriceMinor)} / traveller / stay</b></Link>
-              <Link href="/book?service=combo" className="reservation-combo"><CheckCheck size={23} /><strong>{serviceLabels.combo}</strong><span>One order. Traveller details entered once.</span><b>From {formatPrice(getReservationQuote("one-way",1,"combo",1).totalMinor)} / traveller</b></Link>
+              <Link href="/book?service=flight"><span className="service-card-top"><Plane size={24} aria-hidden="true" /><span>For your itinerary</span></span><strong>{serviceLabels.flight}</strong><span>One-way, return or multi-city. Request the flight document for your intended route.</span><ul><li>Planned flight sectors and dates</li><li>One set of traveller details</li></ul><b>From {formatPrice(business.prices["one-way"])} <span>/ traveller</span></b><span className="service-card-action">Prepare a flight request <ArrowUpRight size={18} aria-hidden="true" /></span></Link>
+              <Link href="/book?service=hotel"><span className="service-card-top"><Hotel size={24} aria-hidden="true" /><span>For your stay</span></span><strong>{serviceLabels.hotel}</strong><span>Already have suitable flight evidence? Choose a hotel-only reservation request.</span><ul><li>City, check-in and check-out dates</li><li>Separate entries for each stay</li></ul><b>{formatPrice(business.hotelPriceMinor)} <span>/ traveller / stay</span></b><span className="service-card-action">Prepare a hotel request <ArrowUpRight size={18} aria-hidden="true" /></span></Link>
+              <Link href="/book?service=combo" className="reservation-combo"><span className="service-card-top"><CheckCheck size={24} aria-hidden="true" /><span>Flight + one stay</span></span><strong>{serviceLabels.combo}</strong><span>Both reservation services in one order. Enter your travellers and contact details once.</span><ul><li>Review flights and stays together</li><li>Save {formatPrice(business.comboDiscountMinor)} per traveller</li></ul><b>From {formatPrice(getReservationQuote("one-way",1,"combo",1).totalMinor)} <span>/ traveller</span></b><span className="service-card-action">Prepare a combo request <ArrowUpRight size={18} aria-hidden="true" /></span></Link>
             </div>
             <TripStarter />
             <div className="hero-facts">
@@ -185,7 +187,7 @@ export default function Home() {
         >
           <div className="section-heading split-heading">
             <div>
-              <p className="eyebrow">SIMPLE, UPFRONT PRICING</p>
+              <p className="eyebrow">Simple, upfront pricing</p>
               <h2 id="pricing-heading">
                 Different journeys.
                 <br />
@@ -253,6 +255,8 @@ export default function Home() {
           <div className="hotel-pricing-note"><h3>Need a dummy hotel booking too?</h3><p>Dummy Hotel Booking: {formatPrice(business.hotelPriceMinor)} per traveller per stay. Dummy Flight + Hotel Combo with one stay: {formatPrice(getReservationQuote("one-way",1,"combo",1).totalMinor)} per traveller, or {formatPrice(getReservationQuote("multi-city",1,"combo",1).totalMinor)} with multi-city flights. Each extra stay adds {formatPrice(business.hotelPriceMinor)} per traveller. The fee covers reservation services, not paid flights or accommodation.</p><div className="hero-actions"><Link className="button button-secondary" href="/book?service=hotel">Get dummy hotel booking</Link><Link className="button button-primary" href="/book?service=combo">Get dummy flight + hotel combo</Link></div></div>
         </section>
 
+        <ReservationExplainer />
+
         <section
           className="how-section section"
           id="how-it-works"
@@ -260,11 +264,11 @@ export default function Home() {
         >
           <div className="container">
             <div className="section-heading centered">
-              <p className="eyebrow">FROM YOUR PLANS TO YOUR INBOX</p>
+              <p className="eyebrow">From your plans to your inbox</p>
               <h2 id="how-heading">
                 A few simple steps. We’ll take it from there.
               </h2>
-              <p>Here’s how ordering will work when bookings open.</p>
+              <p>Prepare and save now. Document preparation follows verified payment; online payments are currently unavailable.</p>
             </div>
             <div className="steps-grid">
               {steps.map((step, index) => (
@@ -296,7 +300,7 @@ export default function Home() {
           aria-labelledby="receive-heading"
         >
           <div>
-            <p className="eyebrow">THOUGHTFULLY PREPARED</p>
+            <p className="eyebrow">Thoughtfully prepared</p>
             <h2 id="receive-heading">
               Your itinerary.
               <br />
@@ -351,7 +355,7 @@ export default function Home() {
               <SampleDocument />
             </div>
             <div className="sample-copy">
-              <p className="eyebrow">A CLEARER PICTURE</p>
+              <p className="eyebrow">A clearer picture</p>
               <h2 id="sample-heading">
                 Know what
                 <br />
@@ -391,14 +395,14 @@ export default function Home() {
           aria-labelledby="account-heading"
         >
           <div className="account-copy">
-            <p className="eyebrow">LESS GUESSWORK, MORE CLARITY</p>
+            <p className="eyebrow">Less guesswork, more clarity</p>
             <h2 id="account-heading">
               One place for
               <br />
               your next steps.
             </h2>
             <p className="section-description">
-              Your account will bring your orders and documents together, so you
+              Your account brings your orders and documents together, so you
               can see what happens next.
             </p>
             <div className="account-features">
@@ -419,7 +423,7 @@ export default function Home() {
               Explore your account <ArrowUpRight size={18} />
             </Link>
             <p className="small-note">
-              Save drafts and view unpaid orders. Payments and documents come later.
+              Resume saved details, check order progress and access available documents.
             </p>
           </div>
           <div className="account-preview">
@@ -428,48 +432,43 @@ export default function Home() {
                 <UserRound size={20} />
               </span>
               <strong>My orders</strong>
-              <span className="preview-label">ILLUSTRATIVE PREVIEW</span>
+              <span className="preview-label">Account features</span>
             </div>
             <div className="account-order">
               <div className="order-title">
-                <span>EXAMPLE ORDER</span>
-                <span>One-way · 1 passenger</span>
+                <span>Your travel paperwork</span>
+                <span>Flight · Hotel · Combo</span>
               </div>
               <div className="account-route">
-                <strong>New Delhi</strong>
+                <strong>Plan</strong>
                 <ArrowRight size={20} />
-                <strong>Dubai</strong>
+                <strong>Review</strong>
               </div>
-              <div className="account-status">
+              <div className="account-feature-grid">
                 <div>
-                  <span>Payment</span>
-                  <strong>
-                    <span className="status-dot" /> Paid
-                  </strong>
+                  <span>Save</span>
+                  <strong>Your details</strong>
                 </div>
                 <div>
-                  <span>Fulfilment</span>
-                  <strong>
-                    <span className="status-dot amber" /> Preparing
-                  </strong>
+                  <span>Track</span>
+                  <strong>Order progress</strong>
                 </div>
                 <div>
-                  <span>Service fee</span>
-                  <strong>{formatPrice(business.prices["one-way"])}</strong>
+                  <span>Download</span>
+                  <strong>Available PDFs</strong>
                 </div>
               </div>
               <div className="document-pending">
                 <FileText size={20} />
                 <div>
-                  <strong>Your document will appear here</strong>
-                  <span>Available after our team uploads it</span>
+                  <strong>Documents, together in your account</strong>
+                  <span>Available after payment and document preparation</span>
                 </div>
                 <Download size={17} />
               </div>
             </div>
             <div className="account-preview-bottom">
-              <ShieldCheck size={15} /> Planned private access · No real order
-              shown
+              <ShieldCheck size={15} /> Private access with your verified email
             </div>
           </div>
         </section>
@@ -481,7 +480,7 @@ export default function Home() {
         >
           <div className="container faq-grid">
             <div>
-              <p className="eyebrow">A LITTLE CLARITY</p>
+              <p className="eyebrow">A little clarity</p>
               <h2 id="faq-heading">
                 Good questions.
                 <br />
@@ -491,9 +490,9 @@ export default function Home() {
                 A few things to know before
                 <br className="desktop-break" /> you plan your dummy ticket.
               </p>
-              <DevelopmentAction notice="contact" className="text-link">
-                Contact information <ArrowUpRight size={17} />
-              </DevelopmentAction>
+              <Link href="/contact" className="text-link">
+                Booking help <ArrowUpRight size={17} />
+              </Link>
             </div>
             <div className="faq-list">
               {faqs.map((faq, index) => (
@@ -514,32 +513,27 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="container section discovery-links" aria-labelledby="planning-heading">
-          <p className="eyebrow">BEFORE YOU PREPARE YOUR REQUEST</p>
-          <h2 id="planning-heading">Understand the document. Check the requirements.</h2>
-          <p>Explore <Link href="/dummy-ticket">dummy flight and hotel services</Link>, compare <Link href="/pricing">service fees</Link>, or read the <Link href="/how-it-works">full booking process</Link>.</p>
-          <p>Start with <Link href="/destinations">sourced destination notes</Link> and <Link href="/guides">practical planning guides</Link>. See <Link href="/sample-dummy-ticket">illustrative samples</Link> and <Link href="/faq">all service FAQs</Link> before booking.</p>
-        </section>
+        <PlanningLibrary items={collections.guides} notes={collections.destinations} />
         <section className="container closing-section">
           <div>
             <p className="eyebrow">
-              <Sparkles size={15} /> READY FOR YOUR NEXT CHAPTER?
+              <Sparkles size={15} /> Ready for your next chapter?
             </p>
             <h2>
               Start with a plan.
               <br />
               We’ll help with the paperwork.
             </h2>
-            <p>Dummy Ticket for Visa applications, with a human touch.</p>
+            <p>Flight, hotel or both. A clear request starts with the right details.</p>
           </div>
           <div className="closing-action">
             <Link href="/book" className="button button-primary">
-              Book Dummy Ticket <ArrowUpRight size={19} />
+              Book dummy ticket <ArrowUpRight size={19} />
             </Link>
-            <span>Prepare your booking draft · Development preview</span>
+            <span>Flight, hotel or both · Review before saving</span>
           </div>
         </section>
       </main>
-    </DevelopmentNoticeProvider>
+    </>
   );
 }

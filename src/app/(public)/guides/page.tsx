@@ -1,4 +1,4 @@
 import { PublicRoute, pageMetadata } from "@/components/public/public-route";
 
-export const metadata = pageMetadata("guides");
+export async function generateMetadata() { return pageMetadata("guides"); }
 export default function Page() { return <PublicRoute slug="guides" />; }

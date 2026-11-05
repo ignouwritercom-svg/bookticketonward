@@ -3,7 +3,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { publicEntries } from "../src/content/registry";
 import { artifact } from "./artifacts";
 
-const privatePages = ["/book", "/login", "/account/orders", "/account/notifications", "/account/orders/11111111-1111-4111-8111-111111111111", "/admin", "/admin/orders", "/admin/notifications", "/admin/orders/11111111-1111-4111-8111-111111111111"];
+const privatePages = ["/book", "/login", "/account", "/account/drafts", "/account/documents", "/account/settings", "/account/help", "/account/orders", "/account/notifications", "/account/orders/11111111-1111-4111-8111-111111111111", "/admin", "/admin/orders", "/admin/notifications", "/admin/orders/11111111-1111-4111-8111-111111111111"];
 const routes = [...publicEntries.map(entry => entry.path), ...privatePages, "/not-a-public-page", "/destinations/not-published", "/guides/not-published"];
 
 test("one consistent site header, logo, navigation and footer across every registered page and workspace", async ({ page }) => {

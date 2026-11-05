@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { ArrowLeft } from "lucide-react";
 import { business } from "@/config/business";
 import { BookingForm } from "@/components/booking/booking-form";
+import { publicSite } from "@/lib/site-content";
 import "./booking.css";
 import "../account/account.css";
 
@@ -21,9 +22,9 @@ export default function BookPage() {
         <div id="booking-main" className="container">
           <div className="booking-intro">
             <Link href="/" className="text-link booking-back"><ArrowLeft size={16} /> Back to homepage</Link>
-            <p className="eyebrow">YOUR PLANS, CLEARLY DOCUMENTED</p>
+            <p className="eyebrow">Your plans, clearly documented</p>
             <h1>
-              Book Dummy Ticket<span>.</span>
+              Book Dummy Ticket
             </h1>
             <p>Dummy Flight Ticket, Dummy Hotel Booking or both in one combo. Enter your traveller details once.</p>
           </div>
@@ -34,11 +35,11 @@ export default function BookPage() {
               </div>
             }
           >
-            <BookingForm />
+            <ManagedBooking />
           </Suspense>
           <noscript>
             <p className="booking-note">
-              Enable JavaScript to complete the booking preview. No details are
+              Enable JavaScript to complete your booking request. No details are
               collected without it.
             </p>
           </noscript>
@@ -46,4 +47,8 @@ export default function BookPage() {
       </main>
     </>
   );
+}
+async function ManagedBooking() {
+  const { preferences, pricing, policies } = await publicSite();
+  return <BookingForm runtime={{ preferences, pricing, policies }} />;
 }

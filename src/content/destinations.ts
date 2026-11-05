@@ -1,4 +1,5 @@
 import type { Destination } from "./types";
+import { withContentDepth } from "./depth";
 
 export const ukSource = {
   title: "GOV.UK — Visiting the UK: guide to supporting documents",
@@ -9,9 +10,9 @@ export const franceSource = {
   url: "https://www.france-visas.gouv.fr/en/tourisme-et-sejour-prive",
 };
 
-export const destinations: Destination[] = [
+const baseDestinations: Destination[] = [
   {
-    country: "France", slug: "france", title: "France: flight and hotel reservation guidance",
+    country: "France", slug: "france", title: "France: Flight and Hotel Reservation Guidance",
     description: "Plan France travel paperwork using official France-Visas guidance. Understand dummy flight tickets, hotel bookings and the limits of a combined reservation.",
     intro: "Planning a visit to France? Start with the official checklist for your circumstances, then decide whether a Dummy Flight Ticket, Dummy Hotel Booking or combo is relevant to your application.",
     reviewed: "2026-11-03",
@@ -19,7 +20,7 @@ export const destinations: Destination[] = [
       { heading: "Start with France-Visas", paragraphs: ["France-Visas separates tourism and private stays by the reason and length of the visit. Its online guidance helps identify the supporting documents for your situation. Follow the official tourism page below into the appropriate category; this page is not a personalised visa checklist."], links: [{ href: franceSource.url, label: "Check the official tourism and private-stay guidance" }] },
       { heading: "Match the request to your actual itinerary", paragraphs: ["For a planned Paris stay followed by another city, check flight dates against each check-in and check-out date. A hotel preference in our form is a request, not evidence that a property has accepted a reservation.", "If your official checklist requests accommodation evidence, establish which form it accepts before selecting a hotel document. Do not substitute a commercial hotel request for evidence of a different accommodation arrangement."], items: ["Use the same traveller names across your application and request.", "Review overnight journeys before choosing check-in dates.", "List each intended stay separately and check for gaps."] },
       { heading: "Choose only the service you need", paragraphs: ["Already have suitable flight evidence? You can prepare a hotel-only request. If both document types are relevant, the combo collects traveller details once. Service fees do not pay for flights or rooms, and a temporary reservation does not establish entry eligibility."], links: [{ href: "/pricing", label: "Compare flight, hotel and combo fees" }] },
-      { heading: "Before you submit documents", paragraphs: ["Recheck the official checklist and the final document details near submission. Reservation conditions can change; no fixed validity or universal acceptance is promised. Our sample layout is never suitable for an application.", "Payments remain on hold in this preview. Saving an unpaid order does not reserve a flight or hotel and does not start document preparation."] },
+      { heading: "Before you submit documents", paragraphs: ["Recheck the official checklist and the final document details near submission. Reservation conditions can change; no fixed validity or universal acceptance is promised. Our sample layout is never suitable for an application.", "Saving a request does not reserve a flight or hotel. Online payments are currently unavailable, and unpaid orders do not start document preparation."] },
     ],
     faqs: [
       { question: "Does this page cover every France visa category?", answer: "No. Use France-Visas for your own purpose, nationality, residence and duration. This page explains how to review a reservation request, not whether a visa will be granted." },
@@ -29,7 +30,7 @@ export const destinations: Destination[] = [
     related: [{ href: "/dummy-ticket", label: "Understand the reservation service" }, { href: "/destinations/united-kingdom", label: "How UK visitor guidance differs" }],
   },
   {
-    country: "United Kingdom", slug: "united-kingdom", title: "UK visitor documents: check before booking",
+    country: "United Kingdom", slug: "united-kingdom", title: "UK Visitor Documents: Check Before Booking",
     description: "Read the UK visitor-document distinction before requesting a dummy flight ticket or hotel booking. Follow GOV.UK guidance rather than assuming a reservation is needed.",
     intro: "A dummy flight ticket or hotel booking is not automatically useful for a UK visitor application. Read the official evidence guidance before spending money on reservation documents.",
     reviewed: "2026-11-03",
@@ -47,3 +48,5 @@ export const destinations: Destination[] = [
     related: [{ href: "/faq", label: "Service questions and limitations" }, { href: "/destinations/france", label: "France reservation guidance" }],
   },
 ];
+
+export const destinations = baseDestinations.map(withContentDepth);

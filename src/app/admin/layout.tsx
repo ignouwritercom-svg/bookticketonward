@@ -1,11 +1,13 @@
-import Link from "next/link";
 import type { Metadata } from "next";
+import { Suspense } from "react";
+import { AdminLocation, AdminNavigation } from "@/components/admin/navigation";
+import { AdminNoScriptNavigation } from "@/components/admin/workspace";
 import "../account/account.css";
 import "./admin.css";
 export const metadata: Metadata = { title: "Staff desk | DummyTicket", robots: { index: false, follow: false } };
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return <main id="main-content" tabIndex={-1} className="account-page admin-page">
-    <nav className="workspace-navigation" aria-label="Staff navigation"><span>Staff desk</span><Link href="/admin" prefetch={false}>Overview</Link><Link href="/admin/orders" prefetch={false}>Orders</Link><Link href="/admin/notifications" prefetch={false}>Notifications</Link><Link href="/account/orders" prefetch={false}>My account</Link></nav>
-    {children}
+    <AdminNoScriptNavigation />
+    <div className="ops-shell"><Suspense fallback={<p className="ops-nav-loading" role="status">Loading staff navigation…</p>}><AdminNavigation /></Suspense><div className="ops-content"><Suspense fallback={null}><AdminLocation /></Suspense><noscript><p className="ops-notice">Enable JavaScript to view private staff records and use management actions. Public website content remains available.</p></noscript>{children}</div></div>
   </main>;
 }

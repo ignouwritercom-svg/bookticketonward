@@ -78,7 +78,9 @@ test("SYNTHETIC order detail renders complete snapshots, honest statuses and res
   await expect(page.locator(".account-total")).toHaveText("₹699 INR");
   await expect(
     page.getByText(`Version ${bookingPolicy.version}`, { exact: true }),
-  ).toBeVisible();
+  ).toHaveCount(0);
+  await expect(page.getByText(order.policy_snapshot, { exact: true })).toBeVisible();
+  expect(renderToStaticMarkup(createElement(OrderDetails, { order, staffView: true }))).toContain(`Version ${bookingPolicy.version}`);
   expect(
     (
       await new AxeBuilder({ page })

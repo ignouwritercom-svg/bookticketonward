@@ -13,7 +13,7 @@ test("unauthenticated admin routes and document APIs fail closed with private ca
   for(const path of ["/admin","/admin/orders",`/admin/orders/${id}`]) {
     const response=await page.goto(path);
     expect(response?.headers()["cache-control"]).toContain("no-store");
-    await expect(page.getByRole("heading",{name:"Admin services unavailable"})).toBeVisible();
+    await expect(page.getByRole("heading",{name:"Admin Services Unavailable"})).toBeVisible();
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content","noindex, nofollow");
     await expect(page.getByRole("button",{name:"Start processing"})).toHaveCount(0);
   }
@@ -50,6 +50,6 @@ test("SYNTHETIC customer published PDF presentation and staff denial remain acce
   }
   await page.goto("/admin");
   await page.locator("main").evaluate((element,html)=>{element.innerHTML=html;},renderToStaticMarkup(createElement(AdminDenied)));
-  await expect(page.getByRole("heading",{name:"Staff access required"})).toBeVisible();
+  await expect(page.getByRole("heading",{name:"Staff Access Required"})).toBeVisible();
   expect((await new AxeBuilder({page}).withTags(["wcag2a","wcag2aa","wcag21aa"]).analyze()).violations).toEqual([]);
 });

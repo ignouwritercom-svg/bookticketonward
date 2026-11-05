@@ -13,7 +13,7 @@ async function Details({ params }: { params: Promise<{ orderId: string }> }) {
   if (!client || !user) return <AccountUnavailable />;
   const missing = (
     <div className="account-empty">
-      <h1>Order not found</h1>
+      <h1>Order Not Found</h1>
       <p>This order is unavailable for your account.</p>
       <Link href="/account/orders">Return to your orders</Link>
     </div>
@@ -28,7 +28,7 @@ async function Details({ params }: { params: Promise<{ orderId: string }> }) {
   if (error)
     return (
       <div role="alert">
-        <h1>Unable to load this order</h1>
+        <h1>Unable to Load This Order</h1>
         <p>Please refresh to retry.</p>
         <Link href="/account/orders">Return to your orders</Link>
       </div>

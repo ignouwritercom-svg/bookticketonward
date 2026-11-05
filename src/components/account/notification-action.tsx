@@ -18,7 +18,7 @@ export function NotificationAction({ id, retry = false, ambiguous = false }: { i
     requestId.current ??= crypto.randomUUID();
     try {
       await accountRequest(retry ? "/api/admin/notifications" : "/api/notifications", { id, requestId: requestId.current, acknowledgeDuplicate: acknowledged });
-      const heading = button.current?.closest("article")?.querySelector<HTMLElement>("h2,h3");
+      const heading = button.current?.closest("article, li")?.querySelector<HTMLElement>("h2,h3");
       if (heading) { heading.tabIndex = -1; heading.focus(); }
       startTransition(() => router.refresh());
     } catch (error) { setError(error instanceof Error ? error.message : "Unable to update notification."); }

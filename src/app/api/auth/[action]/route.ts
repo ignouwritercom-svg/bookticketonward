@@ -63,7 +63,7 @@ export async function POST(
         );
       if (error)
         return failure(
-          "A code could not be sent. Please try later or check the email service setup.",
+          "We couldn’t send a sign-in code. Check your email address and try again later.",
           503,
         );
       return json({ ok: true });

@@ -1,5 +1,55 @@
 # Product and current scope
 
+## Admin navigation refinement — 5 November 2026
+
+Added grouped Reservations/Website & Business/Monitoring navigation, nested editor links, breadcrumbs, context links, keyboard section search and a mobile drawer. The overview prioritizes real queues/exceptions and separates reservation tasks from website management. Existing staff authorization, CMS publication/unsaved-edit handling, paid-only document operations and customer ownership are preserved. No new backend capability, migration, credential or deployment is introduced by this refinement.
+
+## Admin operations and no-code management — 5 November 2026
+
+Expanded the existing staff workspace with paid-work queues, a document library, submitted-order customer directory, content/FAQ/guide/destination editing, homepage/support/timing settings, runtime service pricing, versioned booking acceptance policies and revision/audit views. Existing verified staff accounts remain the only operators; no role hierarchy or staff-grant UI is added. Draft → saved preview → review/publish and optimistic revisions keep routine website updates out of source files. Restore creates a draft rather than silently changing public content.
+
+One additive fifth migration and an explicit server enable flag are required for persistent website management; neither is applied automatically. Enabled public views and server/database repricing share the canonical catalog. Existing order totals/policy snapshots, customer ownership, RLS, private documents and paid-only preparation remain intact. Payments remain on hold; there is no manual paid or gateway-enable action. Setup, exact scope and test limits: [ADMIN_WORKSPACE.md](ADMIN_WORKSPACE.md).
+
+## Customer workspace expansion — 5 November 2026
+
+Customers now have a dedicated overview, separate saved drafts, searchable/paginated order history, private document library, activity, account/security and contextual help. Metrics and rows use real owner-scoped data; no example bookings or balances appear in the application. Order search/filter/sort/page requests use a bounded authenticated POST and return minimal summaries, keeping passenger/contact details out of list payloads, URLs and browser storage. Document listings require paid own orders and current publication; downloads retain all existing independent authorization checks.
+
+The sidebar/mobile navigation and card layouts share the existing identity and public header/footer. A current-state progress list keeps payment, preparation and PDF availability distinct. Draft resume, notifications and sign-out retain their working backend flows. Settings shows verified identity and guidance; unsupported profile edits, payment/refund/cancellation and support-ticket controls are not invented. No migration/security/credential change, remote mutation or deployment. Architecture, routes and test separation: [CUSTOMER_WORKSPACE.md](CUSTOMER_WORKSPACE.md).
+
+## Booking form copy cleanup — 5 November 2026
+
+Removed the prominent location-provider attribution sentence from homepage/booking forms. The common footer now offers a collapsed “Data credits” disclosure with required GeoNames credit, licence, adaptation notice and OurAirports reference, usable without JavaScript. No source names, dataset counts or implementation details are added to the booking steps. The source credit remains publicly accessible; it is not private business configuration. Existing service limitations, autocomplete behaviour, data protection and payment restrictions are unchanged.
+
+## Booking location selection — 5 November 2026
+
+Flight fields on the homepage and every booking sector now support city/airport/IATA suggestions; hotel-only and combo stays support destination-city/country search with country auto-fill on explicit city selection. Editing a city selected in the current step clears its derived country, while manual country overrides remain user-owned. Country preferences do not lock city search, including when returning to an existing stay. Existing free text remains supported, including when search is unavailable. The optional hotel/area preference is still manual: there is no live hotel-property inventory. No availability, paid travel or confirmed reservation is implied.
+
+Reference names are served from an attributed server-only OurAirports/GeoNames snapshot via a bounded same-origin API. No credentials, third-party typing requests, browser storage, new npm dependencies or change to pricing/payment/auth/database/security is involved. Research, behaviour and provenance: [LOCATION_SEARCH.md](LOCATION_SEARCH.md).
+
+## Dedicated brand, help, service and policy pages — 5 November 2026
+
+Added a genuine `/about` page covering the service purpose and approach without invented people, founding dates, accreditations or company history. The existing service, contact, terms/privacy/refunds, FAQ and process URLs now use purpose-specific page families rather than the guide/article layout. Service fees still use shared integer-paise prices; Contact is a working help hub with real task links rather than an undeliverable enquiry form. Policy tabs, draft/order/document distinctions and full readable chapters make provisional policy information easier to use.
+
+There are now 18 public URLs, including About. Its metadata and visible content use AboutPage structured data; Contact uses ContactPage. All draft/indexing/access controls remain. The common footer makes About discoverable across public and private workspaces. Research decisions and source links are in [PUBLIC_PAGE_REDESIGN.md](PUBLIC_PAGE_REDESIGN.md). Legal/operational approvals remain outstanding and no live gateway or deployment is included.
+
+## Public content depth and decision support — 5 November 2026
+
+Home and all 16 editorial public URLs now offer more practical detail. Service comparisons explain flight-only, hotel-only and combo choices; pricing includes shared-quote group/stay examples; process content distinguishes drafts, orders, preparation and available documents. Samples explain what to inspect, help covers concrete account/document issues, and guides add a requirement worksheet and an overnight-arrival example. Destination additions remain planning checklists supported by the existing official sources. Provisional policies gain workflow explanations without invented legal terms, eligibility, refund deadlines, retention periods or support contacts.
+
+Public pages use an overview panel, structured cards, walkthroughs, checklists and contextual next actions. The homepage adds richer service cards, a service-value explanation and a guide/destination library while preserving the trip starter and all working flows. Price examples derive from the existing integer-paise quote function. No authentication, order-state, payment, fulfilment or security change is included.
+
+This is a content/design improvement, not measured conversion uplift. Purchase conversion remains limited by payments being unavailable; direct support details and final policies are still unapproved. No analytics/tracking has been added. Subsequent measurement needs an explicitly approved, privacy-conscious plan and functioning approved business operations.
+
+Typography/case follow the [shared visual conventions](DESIGN.md): readable body/input sizes, Title Case for H1 page headings, sentence case for other generic UI and preserved formal service names/acronyms. Public title metadata and structured data share the editorial H1 titles. Order-reference headings retain their exact identifiers. Display-copy and scoped style changes do not transform user data, alter booking/policy snapshots or change service fees. Home account features remain visually consistent after account-route navigation.
+
+## Customer-facing content review — 4 November 2026
+
+Public copy describes the available dummy flight, dummy hotel and combo request service without implementation phases, setup instructions or business approval tasks. Homepage help opens the actual help page; account messaging reflects implemented private downloads, and a feature panel replaces the fictional paid-order illustration. Customer-facing failures explain the outcome and retry path rather than directing customers to configure Supabase or apply SQL.
+
+Online payments remain unavailable and this is stated at the trip starter, fee estimator, pricing, process, FAQ, booking and unpaid-order screens. Saving does not charge, reserve travel or initiate fulfilment. Prices, authoritative policy text/versions, accepted snapshots, authentication, RLS and paid-only document rules are unchanged. The terms, privacy and refund pages still explicitly identify their provisional status and remain noindex; the contact page provides self-service help and accurately states that direct contact is unavailable. The owner confirmed support contacts are **not final**.
+
+Owner tasks are in the authenticated staff overview and [LAUNCH_READINESS.md](LAUNCH_READINESS.md), including the separate deployed account-configuration problem. No deployment, credentials change or remote mutation was performed during this review. Earlier descriptions of development banners/popups below are historical and superseded by this section.
+
 The shared root site layout now provides one consistent header/footer across public pages, booking, login, customer and staff routes. Staff navigation remains a labelled workspace toolbar. This is a presentation consolidation: booking data handling, OTP, ownership/staff authorization, payment restrictions and document operations remain unchanged. See [DESIGN.md](DESIGN.md) for the shared layout conventions.
 
 ## Phase 7 transactional notifications

@@ -8,14 +8,14 @@ export function SampleDocument({ compact = false }: { compact?: boolean }) {
     >
       <div className="document-top">
         <span>
-          <Plane size={17} /> TRAVEL ITINERARY
+          <Plane size={17} /> Travel itinerary
         </span>
-        <span className="sample-chip">SAMPLE</span>
+        <span className="sample-chip">Sample</span>
       </div>
       <div className="document-heading">
         <div>
-          <span className="document-label">PREPARED FOR</span>
-          <strong>Sample Traveller</strong>
+          <span className="document-label">Prepared for</span>
+          <strong>Sample traveller</strong>
         </div>
         <FileText size={27} strokeWidth={1.3} />
       </div>
@@ -36,22 +36,22 @@ export function SampleDocument({ compact = false }: { compact?: boolean }) {
       </div>
       <div className="document-details">
         <div>
-          <span className="document-label">DEPARTURE</span>
+          <span className="document-label">Departure</span>
           <strong>Example travel date</strong>
         </div>
         <div>
-          <span className="document-label">TRIP TYPE</span>
+          <span className="document-label">Trip type</span>
           <strong>One-way</strong>
         </div>
       </div>
       {!compact && (
         <div className="document-details">
           <div>
-            <span className="document-label">PASSENGER</span>
+            <span className="document-label">Passenger</span>
             <strong>1 adult · Example only</strong>
           </div>
           <div>
-            <span className="document-label">RESERVATION REFERENCE</span>
+            <span className="document-label">Reservation reference</span>
             <strong>Not issued · Sample</strong>
           </div>
         </div>

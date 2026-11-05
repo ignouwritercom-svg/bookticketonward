@@ -4,10 +4,10 @@ import { failure, json, readBody } from "@/lib/api";
 import { uuidPattern } from "@/lib/account";
 
 const actionSchema = z.object({
-  action: z.enum(["start", "note", "publish", "withdraw", "deliver_email", "deliver_whatsapp"]),
+  action: z.enum(["start", "note", "publish", "withdraw", "complete", "abort", "deliver_email", "deliver_whatsapp"]),
   documentId: z.string().uuid().optional(),
   note: z.string().trim().min(1).max(2000).optional(),
-});
+}).strict();
 export async function POST(request: Request, { params }: { params: Promise<{ orderId: string }> }) {
   let body: unknown;
   try { body = await readBody(request); } catch { return failure("Invalid request.", 403); }

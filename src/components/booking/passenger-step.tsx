@@ -113,7 +113,7 @@ export function PassengerStep({ today }: { today: string }) {
       <div className="booking-note">
         <UserRound size={18} />
         <p>
-          The configured service fee applies to each passenger. Adding or
+          The service fee applies to each passenger. Adding or
           removing a passenger updates your total.
         </p>
       </div>

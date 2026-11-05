@@ -4,6 +4,7 @@ import { business, formatPrice, serviceLabels, type ServiceType } from "@/config
 import { emptyHotelStay, emptySector, type BookingDraft } from "@/lib/booking";
 import { BookingField } from "./field";
 import { TripStep } from "./trip-step";
+import { HotelLocationFields } from "./location-field";
 
 export function ServiceStep({today}:{today:string}) {
   const {control,register,getValues,setValue,clearErrors,setFocus,formState:{errors}}=useFormContext<BookingDraft>();
@@ -25,8 +26,7 @@ export function ServiceStep({today}:{today:string}) {
       {fields.map((field,index)=><fieldset className="booking-entry" key={field.id}><legend>Hotel stay {index+1}</legend>
         {fields.length>1 && <button type="button" className="remove-button" onClick={()=>{remove(index);clearErrors("hotels");requestAnimationFrame(()=>setFocus(`hotels.${Math.max(0,index-1)}.city`));}} aria-label={`Remove hotel stay ${index+1}`}>Remove stay</button>}
         <div className="booking-fields-grid">
-          <BookingField name={`hotels.${index}.city`} label="Hotel city" maxLength={100} placeholder="e.g. Paris" />
-          <BookingField name={`hotels.${index}.country`} label="Country" maxLength={80} placeholder="e.g. France" />
+          <HotelLocationFields index={index} />
           <BookingField name={`hotels.${index}.checkIn`} label="Check-in date" type="date" min={today} />
           <BookingField name={`hotels.${index}.checkOut`} label="Check-out date" type="date" min={today} />
           <div className="booking-field"><label htmlFor={`rooms-${index}`}>Rooms</label><input id={`rooms-${index}`} type="number" min={1} max={business.maxPassengers} {...register(`hotels.${index}.rooms`,{valueAsNumber:true})} aria-invalid={!!errors.hotels?.[index]?.rooms} aria-describedby={errors.hotels?.[index]?.rooms ? `rooms-error-${index}` : undefined} />{errors.hotels?.[index]?.rooms && <p className="field-error" id={`rooms-error-${index}`}>{errors.hotels[index]?.rooms?.message}</p>}</div>

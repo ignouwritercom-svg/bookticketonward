@@ -63,7 +63,7 @@ export function Header() {
         <div className="header-actions">
           <AccountLink />
           <Link href="/book" className="button button-primary">
-            Book Dummy Ticket <ArrowUpRight size={16} />
+            Book dummy ticket <ArrowUpRight size={16} />
           </Link>
         </div>
         <button
@@ -91,10 +91,10 @@ export function Header() {
         {links.map(navigationLink)}
         <AccountLink />
         <Link href="/book" className="button button-primary">
-          Book Dummy Ticket <ArrowUpRight size={16} />
+          Book dummy ticket <ArrowUpRight size={16} />
         </Link>
       </nav>
-      <noscript><style>{`.menu-toggle{display:none!important}.site-header{position:relative}`}</style><nav className="no-js-navigation" aria-label="Navigation without JavaScript">{links.map(link => <a key={link.href} href={link.href}>{link.label}</a>)}<a href="/login">Sign in</a><a href="/book">Book Dummy Ticket</a></nav></noscript>
+      <noscript><style>{`.menu-toggle{display:none!important}.site-header{position:relative}`}</style><nav className="no-js-navigation" aria-label="Navigation without JavaScript">{links.map(link => <a key={link.href} href={link.href}>{link.label}</a>)}<a href="/login">Sign in</a><a href="/book">Book dummy ticket</a></nav></noscript>
     </header>
   );
 }

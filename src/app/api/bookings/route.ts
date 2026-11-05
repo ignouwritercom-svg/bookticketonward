@@ -3,6 +3,8 @@ import { bookingSchema } from "@/lib/booking";
 import { policyForService, getReservationQuote } from "@/config/business";
 import { verifiedCustomer } from "@/lib/supabase/server";
 import { failure, json, readBody, unavailable } from "@/lib/api";
+import { readBookingCatalog } from "@/lib/site-content";
+import { pricingCatalog } from "@/lib/site-management";
 
 const saveSchema = z
   .object({
@@ -61,7 +63,7 @@ export async function POST(request: Request) {
         return failure(
           error.code === "P0001"
             ? "This draft changed or was submitted elsewhere. Your edits are still here. Open your dashboard in another tab to review the saved version."
-            : "Unable to save this draft. Please check the database setup or retry.",
+            : "We couldn’t save your details. Your edits are still on this page. Please try again later.",
           error.code === "P0001" ? 409 : 503,
         );
       return json({ draft: data });
@@ -103,12 +105,14 @@ export async function POST(request: Request) {
         "Reconcile your verified account email and save the draft again.",
         409,
       );
-    const bookingPolicy=policyForService(booking.data.service);
+    const runtime = await readBookingCatalog();
+    const bookingPolicy=policyForService(booking.data.service,runtime.policies);
     const quote = getReservationQuote(
       booking.data.trip.type,
       booking.data.passengers.length,
       booking.data.service,
       booking.data.hotels.length,
+      pricingCatalog(runtime.pricing),
     );
     // Client values are an acceptance precondition, never an authoritative price.
     if (
@@ -129,7 +133,7 @@ export async function POST(request: Request) {
     });
     if (error)
       return failure(
-        "The order could not be created. Review the saved draft and retry. If this continues, the database price/policy setup may need updating.",
+        "We couldn’t create the order. Open your saved draft, review the current details and service fee, then try again.",
         409,
       );
     return json({ orderId: data });

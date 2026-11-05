@@ -1,0 +1,27 @@
+import type { PublicContent } from "./types";
+
+export const aboutPage: PublicContent = {
+  slug: "about",
+  title: "About DummyTicket",
+  description: "Get to know DummyTicket: dummy flight tickets, dummy hotel bookings and combined reservation requests, with clear service fees and private account access.",
+  intro: "A clearer way to organise your dummy flight ticket and hotel booking requests. Understand the service, review the details and keep your travel paperwork together.",
+  reviewed: "2026-11-05",
+  presentation: "about",
+  sections: [
+    { heading: "Travel paperwork deserves a little more clarity", paragraphs: ["Planning a journey involves more than choosing a destination. Names need to match, dates need to line up and the document you request needs to make sense for your purpose. DummyTicket brings those details into a single, reviewable request.", "Our focus is specific: temporary flight reservation documents, temporary hotel reservation documents and a combo when you need both. We explain the service fee separately from the cost of flying or staying, so you can make an informed choice before saving your details."] },
+    { heading: "What we want your experience to feel like", paragraphs: ["Good service starts with understanding what you are requesting. These principles guide the way the website presents your options and handles your saved request."], cards: [
+      { title: "Clear from the first step", text: "Compare flight, hotel and combo services with their billing units shown. Read what a temporary reservation document covers and what you still need to arrange separately." },
+      { title: "Careful with the details", text: "Review traveller spelling, each flight sector and each hotel stay before creating an order. A combo shares traveller details while keeping individual stays clear." },
+      { title: "Easy to return to", text: "Use a verified email to find saved drafts, confirmed order details and available documents. Your account keeps the request accessible beyond a single browser session." },
+    ] },
+    { heading: "Three services, one considered process", paragraphs: ["Not every journey needs the same document request. Choose the smallest service that fits the evidence you actually need; a combo is an option, not an obligation."], cards: [
+      { title: "Dummy Flight Ticket", text: "For a planned one-way, return or multi-city itinerary. Enter the intended route and dates, then review the travellers included in the request.", link: { href: "/book?service=flight", label: "Explore a flight request" } },
+      { title: "Dummy Hotel Booking", text: "For the temporary hotel reservation document you need for an intended stay. Add city, country, dates and rooms without entering flight details.", link: { href: "/book?service=hotel", label: "Explore a hotel request" } },
+      { title: "Dummy Flight + Hotel Combo", text: "For both document services in one order. Enter travellers and contact details once, then review the complete itinerary and each hotel stay.", link: { href: "/book?service=combo", label: "Explore a combined request" } },
+    ] },
+    { heading: "A request you can follow, not just submit", paragraphs: ["After verifying your email, you can save a reviewed draft and return to it from your account. Creating an order records the details and service fee you confirmed. Editing the draft later does not silently change that order.", "Payment and document preparation remain separate stages. Preparation can start only after verified payment and complete details. Online payments are currently unavailable, so a newly saved order remains awaiting payment and does not reserve travel.", "When documents are prepared and published for an eligible order, you can access them privately through your account. Your chosen email or WhatsApp document-delivery channel is separate from the email you use to sign in."], links: [{ href: "/how-it-works", label: "See each stage of the process" }, { href: "/account/orders", label: "Return to your account" }] },
+    { heading: "Care for your information", paragraphs: ["The booking form asks for the details needed to review the selected request. It does not ask you to upload a passport scan, enter a passport number or provide a postal address. Do not add identity-document images or numbers to optional instructions.", "Saved records and available documents are accessed through your account. Keep your sign-in code private and sign out on shared devices. Our privacy notice explains the information requested and how it is used."], links: [{ href: "/privacy", label: "Read about booking information" }] },
+    { heading: "The distinction that matters", paragraphs: ["A dummy reservation document is not a paid airline ticket, a boarding pass or paid hotel accommodation. Our service fee does not purchase your journey, room rent or entry permission.", "Check the relevant authority's instructions for your circumstances before ordering any document. No commercial service can promise a visa decision or universal acceptance. Review the actual reservation conditions and arrange paid travel separately for your journey."], links: [{ href: "/guides/temporary-reservation-vs-paid-ticket", label: "Understand reservations versus paid travel" }, { href: "/destinations", label: "Find official planning sources" }] },
+  ],
+  related: [{ href: "/dummy-ticket", label: "Explore our reservation services" }, { href: "/pricing", label: "Compare service fees" }, { href: "/contact", label: "Find booking and account help" }],
+};

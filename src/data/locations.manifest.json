@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "generatedAt": "2026-11-04T19:48:30.292541+00:00",
+  "counts": {
+    "airport": 5334,
+    "city": 31807,
+    "country": 249
+  },
+  "snapshotSha256": "8261d02f17271ed92211c642e588414fcdcbea299091c9f9e3e7aa63c999d9e2",
+  "compressedBytes": 3406517,
+  "sources": [
+    {
+      "name": "airports",
+      "url": "https://davidmegginson.github.io/ourairports-data/airports.csv",
+      "sha256": "7d619dcdaec1d2b64950632819f8a4984db2983ea9eeab6e917176dfe3f6e498"
+    },
+    {
+      "name": "countries",
+      "url": "https://davidmegginson.github.io/ourairports-data/countries.csv",
+      "sha256": "2a9dbee691125b0cdb8ceb5fe227c48c903f99c488963b8e53e2ab366521c639"
+    },
+    {
+      "name": "cities",
+      "url": "https://download.geonames.org/export/dump/cities15000.zip",
+      "sha256": "1d7cf2e7b0920b5203a5c0f2b3825e5e5d6e721e3802593cb51b438877796847"
+    },
+    {
+      "name": "regions",
+      "url": "https://download.geonames.org/export/dump/admin1CodesASCII.txt",
+      "sha256": "2e4867f5397acb056ea26377601b57af37cb4c81399770225018e9e439e91ad3"
+    },
+    {
+      "name": "countryInfo",
+      "url": "https://download.geonames.org/export/dump/countryInfo.txt",
+      "sha256": "79f8f59ea01cbb40438bf1856dd6c2ff201f03f8fc72d0530b2646aaf603ef04"
+    }
+  ]
+}

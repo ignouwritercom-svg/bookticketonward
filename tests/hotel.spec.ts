@@ -50,7 +50,7 @@ test("shared hotel validation, approved pricing and URL privacy",()=>{
 
 test("hotel-only booking skips flights, validates stays and renders accessible mobile review",async({page})=>{
   await page.goto("/");
-  await page.getByRole("link",{name:/Dummy Hotel Booking Already have your flight/}).click();
+  await page.locator(".reservation-services").getByRole("link",{name:/Dummy Hotel Booking/}).click();
   await expect(page).toHaveURL(/service=hotel/);
   // Next can retain the previous homepage tree while it is hidden.
   await expect(page.locator("#booking-main").getByLabel("From",{exact:true})).toHaveCount(0);
@@ -104,7 +104,7 @@ test("MOCKED combo saves one canonical draft and creates one correctly priced un
   await expect(page.getByRole("heading",{name:"Hotel stays",exact:true})).toBeVisible();
   await expect(page.getByText("Combo saving per traveller",{exact:true})).toBeVisible();
   await page.getByLabel("I confirm that the passenger names and trip details are correct.").check();
-  await page.getByLabel("I have read and accept the draft service terms for this preview.").check();
+  await page.getByLabel("I have read and accept the provisional service terms.").check();
   await page.getByRole("button",{name:"Save reviewed draft"}).click();
   await expect(page.getByRole("button",{name:"Create order — awaiting payment"})).toBeVisible();
   expect(saved).toBe(true);

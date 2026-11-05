@@ -5,6 +5,7 @@ import { Plus, Route, Trash2 } from "lucide-react";
 import { business, tripTypes } from "@/config/business";
 import { emptySector, type BookingDraft } from "@/lib/booking";
 import { BookingField } from "./field";
+import { BookingLocationField } from "./location-field";
 
 export function TripStep({ today }: { today: string }) {
   const { control, register, getValues, clearErrors, setFocus } =
@@ -48,8 +49,8 @@ export function TripStep({ today }: { today: string }) {
         </div>
       </fieldset>
       <p className="booking-help">
-        Enter a city or airport manually. No live flight search or availability
-        is shown.
+        Search by city, airport name or IATA code. Choose a suggestion or enter
+        a location. Suggestions do not show live flight availability.
       </p>
       {fields.map((field, index) => (
         <fieldset className="booking-entry" key={field.id}>
@@ -76,17 +77,15 @@ export function TripStep({ today }: { today: string }) {
             </div>
           )}
           <div className="booking-fields-grid">
-            <BookingField
+            <BookingLocationField
               name={`trip.sectors.${index}.from`}
               label="From"
-              placeholder="City or airport"
-              maxLength={100}
+              kind="airport"
             />
-            <BookingField
+            <BookingLocationField
               name={`trip.sectors.${index}.to`}
               label="To"
-              placeholder="City or airport"
-              maxLength={100}
+              kind="airport"
             />
             <BookingField
               name={`trip.sectors.${index}.departure`}
